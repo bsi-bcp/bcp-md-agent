@@ -301,3 +301,109 @@ create table fw_user --用户表
   lastUpdateTime       datetime not null , -- '最后更新时间'
   enable               tinyint not null -- '是否有效'
 );
+
+
+drop table if exists md_integration_datasource;
+
+create table md_integration_datasource
+(
+  id                   int(10) not null auto_increment comment '主键id',
+  name                 varchar(20) not null comment '名称',
+  remark               varchar(1000) default NULL comment '备注',
+  tenantId             int(10) not null comment '租户',
+  type                 varchar(10) not null comment '类型',
+  classify             varchar(10) not null comment '分类',
+  nodeId               varchar(200) comment '节点',
+  configValue          varchar(2000) not null comment '配置数据',
+  delFlag              tinyint(4) not null comment '是否删除',
+  createBy             int(10) not null comment '创建人',
+  createTime           datetime not null comment '创建时间',
+  lastUpdateBy         int(10) not null comment '最后更新人',
+  lastUpdateTime       datetime not null comment '最后更新时间',
+  enable               tinyint(4) not null comment '是否有效',
+  primary key (id)
+)
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='数据源管理';
+
+
+drop table if exists md_integration_config;
+
+create table md_integration_config
+(
+  id                   int(10) not null comment '主键id',
+  code                 varchar(50) not null comment '编码',
+  name                 varchar(20) not null comment '名称',
+  remark               varchar(1000) default NULL comment '备注',
+  tenantId             int(10) not null comment '租户',
+  templateId           int(10) not null comment '模板',
+  status               varchar(10) not null comment '状态',
+  nodeId               varchar(200) comment '节点',
+  configValue          varchar(2000) not null comment '配置数据',
+  delFlag              tinyint(4) not null comment '是否删除',
+  createBy             int(10) not null comment '创建人',
+  createTime           datetime not null comment '创建时间',
+  lastUpdateBy         int(10) not null comment '最后更新人',
+  lastUpdateTime       datetime not null comment '最后更新时间',
+  enable               tinyint(4) not null comment '是否有效',
+  primary key (id)
+)
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='集成配置主表';
+
+
+drop table if exists md_integration_config_task;
+
+create table md_integration_config_task
+(
+  id                   int(10) not null comment '主键id',
+  name                 varchar(20) not null comment '名称',
+  configId             int(10) not null comment '集成配置主表ID',
+  status               varchar(10) not null comment '状态',
+  delFlag              tinyint(4) not null comment '是否删除',
+  createBy             int(10) not null comment '创建人',
+  createTime           datetime not null comment '创建时间',
+  lastUpdateBy         int(10) not null comment '最后更新人',
+  lastUpdateTime       datetime not null comment '最后更新时间',
+  enable               tinyint(4) not null comment '是否有效',
+  primary key (id)
+)
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='集成配置任务表';
+
+
+drop table if exists md_integration_task_node;
+
+create table md_integration_task_node
+(
+  id                   int(10) not null comment '主键id',
+  jobId                int(10) not null comment '任务id',
+  type                 varchar(20) not null comment '类型',
+  classify             varchar(20) not null comment '分类',
+  configValue          text not null comment '配置数据',
+  delFlag              tinyint(4) not null comment '是否删除',
+  createBy             int(10) not null comment '创建人',
+  createTime           datetime not null comment '创建时间',
+  lastUpdateBy         int(10) not null comment '最后更新人',
+  lastUpdateTime       datetime not null comment '最后更新时间',
+  enable               tinyint(4) not null comment '是否有效',
+  primary key (id)
+)
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='集成配置任务节点表';
+
+
+drop table if exists md_integration_template;
+
+create table md_integration_template
+(
+  id                   int(10) not null auto_increment comment '主键id',
+  code                 varchar(50) not null comment '编码',
+  name                 varchar(20) not null comment '名称',
+  remark               varchar(1000) default NULL comment '备注',
+  fileUrl              varchar(100) not null comment '文件地址',
+  delFlag              tinyint(4) not null comment '是否删除',
+  createBy             int(10) not null comment '创建人',
+  createTime           datetime not null comment '创建时间',
+  lastUpdateBy         int(10) not null comment '最后更新人',
+  lastUpdateTime       datetime not null comment '最后更新时间',
+  enable               tinyint(4) not null comment '是否有效',
+  primary key (id)
+)
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='模板管理';

@@ -25,9 +25,9 @@
         timeToLiveSeconds="0"
         memoryStoreEvictionPolicy="LRU" />
  
- 	<!-- 连续回调cache. 过期时间为5秒 -->
+ 	<!-- 集成任务配置，永不过期 -->
     <cache
-        name="propList"
+        name="job_config"
         eternal="false"
         maxElementsInMemory="20000"
         overflowToDisk="false"
@@ -35,15 +35,5 @@
         timeToIdleSeconds="0"
         timeToLiveSeconds="0"
         memoryStoreEvictionPolicy="LRU" />
-    <!-- 登录bsi系统token. 过期时间为30分钟 -->
-    <cache
-            name="b-token"
-            eternal="false"
-            maxElementsInMemory="20000"
-            overflowToDisk="false"
-            diskPersistent="false"
-            timeToIdleSeconds="200"
-            timeToLiveSeconds="300"
-            memoryStoreEvictionPolicy="LRU" />
       
 </ehcache>

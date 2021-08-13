@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Data
 @Table(name="md_agent_datasource")
 public class AgDataSource extends AbstractPageEntity {
-    //业务场景名称
+    //名称
     private String name;
     //类型
     private String type;
