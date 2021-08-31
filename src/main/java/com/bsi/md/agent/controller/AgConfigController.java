@@ -1,5 +1,6 @@
 package com.bsi.md.agent.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.vo.resp.FwHttpStatus;
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/conf")
+@RequestMapping(value = "/api")
 public class AgConfigController {
 
     @Autowired
@@ -56,6 +57,7 @@ public class AgConfigController {
      */
     @PostMapping("/console/config")
     public Resp updateConfigForConsole(@RequestBody AgConfigDto config) throws Exception{
+        log.info( "收到bcp控制台下发的配置信息:{}", JSON.toJSONString( config ) );
         return updateConfig(config);
     }
 
@@ -67,6 +69,7 @@ public class AgConfigController {
      */
     @PostMapping("/iot/datasource")
     public Resp updateDataSourceForIot(HttpServletRequest request,@RequestBody AgDataSourceDto dataSource) throws Exception{
+        log.info( "收到bcp控制台下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
         //IOT验签
         Resp rs = verify(request);
         if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
@@ -82,6 +85,7 @@ public class AgConfigController {
      */
     @PostMapping("/console/datasource")
     public Resp updateDataSourceForConsole(@RequestBody AgDataSourceDto dataSource) throws Exception{
+        log.info( "收到bcp控制台下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
         return updateDataSource(dataSource);
     }
 
