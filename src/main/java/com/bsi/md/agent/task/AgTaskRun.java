@@ -39,7 +39,7 @@ public class AgTaskRun extends FwTask {
         AgJobParam param = getJobParam();
         try{
             //配置日志参数，不同日志输出到不同文件
-            MDC.put("taskId", taskId);
+            MDC.put("taskId", name+"-"+taskId);
             log.info("====计划任务开始执行,计划任务名称:{}，编码:{}====",name,taskId);
             //1、获取到执行规则
             AgIntegrationConfigVo config = EHCacheUtil.get(taskId,AgIntegrationConfigVo.class);
