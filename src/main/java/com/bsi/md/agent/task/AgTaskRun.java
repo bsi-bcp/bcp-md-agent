@@ -39,8 +39,8 @@ public class AgTaskRun extends FwTask {
         //初始化日志记录实体类
         String errorId = UUID.randomUUID().toString().replaceAll("-","");
         String error;
-        AgJobParamService agJobParamService = FwSpringContextUtil.getBean("agJobParamService", AgJobParamService.class);
-        AgJobParam param = getJobParam();
+//        AgJobParamService agJobParamService = FwSpringContextUtil.getBean("agJobParamService", AgJobParamService.class);
+//        AgJobParam param = getJobParam();
         try{
             //配置日志参数，不同日志输出到不同文件
             MDC.put("taskId", name+"-"+taskId);
@@ -66,7 +66,7 @@ public class AgTaskRun extends FwTask {
         }finally {
             log.info( "====计划任务:{},执行结束,执行结果:{}====", taskId , result );
             MDC.remove("taskId");
-            agJobParamService.save( param );
+//            agJobParamService.save( param );
         }
 
     }
