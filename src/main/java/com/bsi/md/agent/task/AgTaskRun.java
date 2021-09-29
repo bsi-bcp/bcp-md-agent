@@ -103,6 +103,7 @@ public class AgTaskRun extends FwTask {
         AgApiTemplate a = AgDatasourceContainer.getApiDataSource(obj.getInteger("dataSource"));
         if(a!=null){
             obj.put("path",a.getApiUrl()+obj.getString("path"));
+            obj.put("host",a.getApiUrl());
         }
     }
 }

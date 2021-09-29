@@ -5,6 +5,7 @@ import com.bsi.framework.core.httpclient.common.HttpHeader;
 import com.bsi.framework.core.httpclient.common.HttpMethods;
 import com.bsi.framework.core.httpclient.common.HttpResult;
 import com.bsi.framework.core.httpclient.utils.HttpClientUtil;
+import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -60,7 +61,7 @@ public class HttpUtils {
             result.setHeader( rs.getRespHeaders() );
             result.setResult( rs.getResult() );
         }catch (Exception e){
-            log.error("调用接口报错,报错信息:{}");
+            log.error("调用接口报错,报错信息:{}", ExceptionUtils.getFullStackTrace(e));
             result.setCode(500);
             result.setResult("error");
         }
