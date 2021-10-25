@@ -203,7 +203,7 @@
                     <fileNamePattern>${log.path}/task/task-${taskId}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
                     <maxFileSize>20MB</maxFileSize>
                     <!--日志文档保留天数-->
-                    <maxHistory>15</maxHistory>
+                    <maxHistory>60</maxHistory>
                     <!--日志文件最大占用空间-->
                     <totalSizeCap>2GB</totalSizeCap>
                 </rollingPolicy>
