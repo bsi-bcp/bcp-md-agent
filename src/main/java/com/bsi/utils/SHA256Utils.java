@@ -6,17 +6,21 @@ import java.security.NoSuchAlgorithmException;
 
 public class SHA256Utils {
 
-	public static String getSHA256(String str) {
+	public static String getSHA256(String str,String digest) {
 		MessageDigest messageDigest;
 		String encodestr = "";
 		try {
-			messageDigest = MessageDigest.getInstance("SHA-256");
+			messageDigest = MessageDigest.getInstance(digest);
 			messageDigest.update(str.getBytes(StandardCharsets.UTF_8));
 			encodestr = byte2Hex(messageDigest.digest());
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 		return encodestr;
+	}
+
+	public static String getSHA256(String str) {
+		return getSHA256(str,"SHA-256");
 	}
 
 	private static String byte2Hex(byte[] bytes) {
