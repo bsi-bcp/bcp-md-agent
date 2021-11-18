@@ -17,6 +17,7 @@ import com.bsi.md.agent.engine.integration.Context;
 import com.bsi.md.agent.entity.AgJobParam;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.service.AgJobParamService;
+import com.bsi.md.agent.utils.AgConfigUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -54,7 +55,7 @@ public class AgTaskRun extends FwTask {
             context.setEnv(new HashMap());
             context.put("config", config.getParamMap());
             //处理输入、输出、转换节点的配置
-            rebuildNode(config);
+            AgConfigUtils.rebuildNode(config);
             context.put("inputConfig",config.getInputNode());
             context.put("outputConfig",config.getOutputNode());
             context.put("transformConfig",config.getTransformNode());
@@ -86,25 +87,4 @@ public class AgTaskRun extends FwTask {
         return param;
     }
 
-
-    private void rebuildNode(AgIntegrationConfigVo config){
-        JSONObject in = config.getInputNode();
-        JSONObject out = config.getOutputNode();
-        JSONObject transform = config.getTransformNode();
-        //删除无用配置
-        in.remove("scriptContent");
-        out.remove("scriptContent");
-        transform.remove("scriptContent");
-        //处理路径问题
-        setRealpath(in);
-        setRealpath(out);
-    }
-
-    private void setRealpath(JSONObject obj){
-        AgApiTemplate a = AgDatasourceContainer.getApiDataSource(obj.getString("dataSource"));
-        if(a!=null){
-            obj.put("path",a.getApiUrl()+obj.getString("path"));
-            obj.put("host",a.getApiUrl());
-        }
-    }
 }

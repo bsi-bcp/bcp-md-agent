@@ -4,17 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
+import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.vo.resp.FwHttpStatus;
 import com.bsi.framework.core.vo.resp.Resp;
-import com.bsi.md.agent.entity.dto.AgConfigDto;
-import com.bsi.md.agent.entity.dto.AgConfigDtoForIOT;
-import com.bsi.md.agent.entity.dto.AgDataSourceDto;
-import com.bsi.md.agent.entity.dto.AgDataSourceDtoForIOT;
+import com.bsi.md.agent.constant.AgConstant;
+import com.bsi.md.agent.engine.factory.AgEngineFactory;
+import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
+import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
+import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.entity.dto.*;
+import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.service.AgConfigService;
 import com.bsi.md.agent.service.AgDataSourceService;
+import com.bsi.md.agent.utils.AgConfigUtils;
 import com.huaweicloud.sdk.iot.module.ItClient;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 配置修改api
@@ -188,6 +196,72 @@ public class AgConfigController {
     public Resp updateDataSourceForConsole(@RequestBody AgDataSourceDto dataSource) throws Exception{
         log.info( "收到bcp控制台下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
         return updateDataSource(dataSource);
+    }
+
+    /**
+     * 补数、执行任务
+     * @param param
+     * @throws Exception
+     */
+    @PostMapping("/console/run-task")
+    public Resp runTask(@RequestBody AgTaskParamDto param) throws Exception{
+        log.info( "通过bcp控制台手动运行任务，参数:{}", JSON.toJSONString(param) );
+        return repair(param);
+    }
+
+    /**
+     * 补数、执行任务
+     * @param param
+     * @throws Exception
+     */
+    @PostMapping("/iot/run-task")
+    public Resp runTaskForIot(HttpServletRequest request,@RequestBody AgTaskParamDto param) throws Exception{
+        log.info( "通过iot edge手动运行任务，参数:{}", JSON.toJSONString(param) );
+        //IOT验签
+        Resp rs = verify(request);
+        return repair(param);
+    }
+
+    private Resp repair(AgTaskParamDto param){
+        Resp resp = new Resp();
+        String error = "";
+        String result = "success";
+        try{
+            //配置日志参数，不同日志输出到不同文件
+            MDC.put("taskId", param.getTaskId()+"-repair");
+            //1、获取到执行规则
+            AgIntegrationConfigVo config = JSON.parseObject( EHCacheUtil.getValue(AgConstant.AG_EHCACHE_JOB,param.getTaskId()).toString(),AgIntegrationConfigVo.class);
+            if(config==null){
+                resp.setErrorCodeAndMsg(500,"前置机未找到taskId为{}的任务！");
+                return resp;
+            }
+            log.info("====开始手动执行任务:{}====",param.getTaskId());
+
+
+            //2、调用集成引擎解析规则
+            AgIntegrationEngine engine = AgEngineFactory.getJobEngine(config);
+            Context context = new Context();
+            context.setEnv(new HashMap());
+            //将补数据的参数设置到计划任务的上下文中去
+            Map<String,Object> paramMap = config.getParamMap();
+            paramMap.put("repairParam",param);
+            context.put("config", paramMap);
+            //处理输入、输出、转换节点的配置
+            AgConfigUtils.rebuildNode(config);
+            context.put("inputConfig",config.getInputNode());
+            context.put("outputConfig",config.getOutputNode());
+            context.put("transformConfig",config.getTransformNode());
+
+            AgTaskBootStrap.custom().context(context).engine(engine).exec();
+        }catch (Exception e){
+            result = "failure";
+            error = ExceptionUtils.getFullStackTrace( e );
+            log.error( "计划任务:{},执行失败,失败信息:{}" , param.getTaskId() ,error );
+        }finally {
+            log.info( "====计划任务:{},执行结束,执行结果:{}====", param.getTaskId() , result );
+            MDC.remove("taskId");
+        }
+        return resp;
     }
 
     /**

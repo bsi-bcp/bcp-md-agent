@@ -17,9 +17,7 @@ import com.bsi.md.agent.repository.AgJobRepository;
 import com.bsi.md.agent.task.AgTaskRun;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,10 +42,8 @@ public class AgJobService extends FwService {
      *
      * @return
      */
-    public List<AgJob> findAllEnable() {
-        AgJob example = new AgJob();
-        example.setEnable(true);
-        return agJobRepository.findAll(Example.of(example));
+    public List<AgJob> findAll() {
+        return agJobRepository.findAll();
     }
 
     public Boolean refreshJob() {
@@ -61,13 +57,13 @@ public class AgJobService extends FwService {
             if (CollectionUtils.isNotEmpty(configList)) {
                 agConfigMap = configList.stream().collect(Collectors.toMap(AgConfig::getId, Function.identity()));
             }
-            List<AgJob> jobList = this.findAllEnable();
+            List<AgJob> jobList = this.findAll();
             List<AgApiProxy> apiProxyList = agApiProxyService.findAllEnable();
 
             //3、定时任务初始化
+            List<AgTaskRun> taskList = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(jobList)) {
                 jobSize = jobList.size();
-                List<AgTaskRun> taskList = new ArrayList<>();
                 for (AgJob job : jobList) {
                     //配置初始化到缓存中
                     AgIntegrationConfigVo vo = new AgIntegrationConfigVo();
@@ -81,30 +77,26 @@ public class AgJobService extends FwService {
 
                     JSONObject configParam = JSONObject.parseObject( agConfig.getConfigValue() );
 
-//                    AgNodeVo inputNode = getAgNodeVo(inputNodeConfig);
-//                    AgNodeVo outputNode = getAgNodeVo(outputNodeConfig);
-//                    AgNodeVo transformNode = getAgNodeVo(transformNodeConfig);
-
                     vo.setInputNode(inputNodeConfig);
                     vo.setOutputNode(outputNodeConfig);
                     vo.setTransformNode(transformNodeConfig);
                     vo.setParamMap(configParam.getInnerMap());
 
                     //初始化配置到缓存
-//                    EHCacheUtil.put( job.getId().toString(), JSON.toJSONString(vo) );
                     EHCacheUtil.setValue(AgConstant.AG_EHCACHE_JOB,job.getId(),JSON.toJSONString(vo));
-                    //初始化计划任务
-                    AgTaskRun agTaskRun = new AgTaskRun();
-                    agTaskRun.setCron(job.getCron());
-                    agTaskRun.setTaskId(job.getId().toString());
-                    agTaskRun.setName(job.getName());
-                    taskList.add(agTaskRun);
-
-
+                    //启用的才去执行
+                    if(job.getEnable()){
+                        //初始化计划任务
+                        AgTaskRun agTaskRun = new AgTaskRun();
+                        agTaskRun.setCron(job.getCron());
+                        agTaskRun.setTaskId(job.getId());
+                        agTaskRun.setName(job.getName());
+                        taskList.add(agTaskRun);
+                    }
                 }
-                FwScheduleUtils.clearAndAddTasks(taskList);
-                FwScheduleUtils.refreshTasks();
             }
+            FwScheduleUtils.clearAndAddTasks(taskList);
+            FwScheduleUtils.refreshTasks();
 
             //4、实时接口初始化 TODO
             if (CollectionUtils.isNotEmpty(apiProxyList)) {
