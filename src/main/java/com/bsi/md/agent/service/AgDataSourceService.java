@@ -11,6 +11,7 @@ import com.bsi.md.agent.datasource.AgJdbcTemplate;
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.entity.dto.AgDataSourceDto;
 import com.bsi.md.agent.repository.AgDataSourceRepository;
+import com.bsi.utils.DecryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,13 @@ public class AgDataSourceService extends FwService {
                 size = list.size();
                 for(AgDataSource ds:list){
                     JSONObject config = JSONObject.parseObject( ds.getConfigValue() );
+                    //解密在云端加密的数据
+                    config.forEach((k,v)->{
+                        if("secret_".startsWith(k)){
+                            config.put(k.toString().replace("secret_",""), DecryptUtils.decrypFromHWCloud(v.toString()));
+                            config.remove(k);
+                        }
+                    });
                     //api类型数据源处理
                     if( AgConstant.AG_NODETYPE_API.equals( ds.getType() ) ){
                         AgApiTemplate apiTemplate = new AgApiTemplate();
@@ -52,6 +60,7 @@ public class AgDataSourceService extends FwService {
                     //数据库类型数据源处理
                     }else if( AgConstant.AG_NODETYPE_DATABASE.equals( ds.getType() ) ){
                         AgJdbcTemplate template = new AgJdbcTemplate();
+
                         template.setDataSource(config.getString("driverClassName"),config.getString("url"),config.getString("username"),config.getString("password"));
                         AgDatasourceContainer.addJdbcDataSource(ds.getId(),template);
                     }

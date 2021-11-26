@@ -15,7 +15,7 @@ public class DecryptUtils {
      * @param text
      * @return String
      */
-    public String decrypFromHWCloud(String text){
+    public static String decrypFromHWCloud(String text){
         String result = "";
         try{
             result = IoTEdgeUtil.getItClient().decryptDataFromCloud(text);
