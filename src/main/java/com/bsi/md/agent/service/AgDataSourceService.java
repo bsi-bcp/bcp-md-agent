@@ -80,7 +80,7 @@ public class AgDataSourceService extends FwService {
      * @param ds
      */
     public void updateDS(AgDataSourceDto ds){
-        if(ds.getDelFlag()){
+        if(ds.getDelFlag()!=null&&!ds.getDelFlag()){
             agDataSourceRepository.deleteById(ds.getId());
         }else {
             AgDataSource dataSource = new AgDataSource();
