@@ -17,4 +17,6 @@ public class AgConfigDtoForIOT {
     private String config_values;
     //任务列表
     private String jobs;
+    //删除标识
+    private boolean del_flag;
 }

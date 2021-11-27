@@ -13,8 +13,10 @@ import com.bsi.md.agent.engine.factory.AgEngineFactory;
 import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
 import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.entity.AgConfig;
 import com.bsi.md.agent.entity.dto.*;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
+import com.bsi.md.agent.repository.AgConfigRepository;
 import com.bsi.md.agent.service.AgConfigService;
 import com.bsi.md.agent.service.AgDataSourceService;
 import com.bsi.md.agent.utils.AgConfigUtils;
@@ -72,14 +74,33 @@ public class AgConfigController {
     @PostMapping("/iot/integration/config")
     public Resp updateConfigForIot(HttpServletRequest request, @RequestBody AgConfigDtoForIOT config) throws Exception{
         log.info( "收到IoT Edge控制台下发的配置信息:{}", JSON.toJSONString( config ) );
-        AgConfigDto c = transform(config);
-        log.info("转换之后的配置信息:{}",JSON.toJSONString(c));
         //IOT验签
         Resp rs = verify(request);
         if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
             return rs;
         }
+        if(config.isDel_flag()){
+            return deleteConfig(config);
+        }
+        AgConfigDto c = transform(config);
+        log.info("转换之后的配置信息:{}",JSON.toJSONString(c));
+
         return updateConfig(c);
+    }
+
+    public Resp deleteConfig(AgConfigDtoForIOT config){
+        Resp resp = new Resp();
+        resp.setMsg("删除成功");
+        try {
+            AgConfigDto agConfigDto=new AgConfigDto();
+            agConfigDto.setId(config.getId());
+            agConfigService.deleteConfig(agConfigDto);
+        }catch (Exception e){
+            log.error("删除失败,错误信息：{}", ExceptionUtils.getFullStackTrace(e));
+            resp.setCode(FwHttpStatus.INTERNAL_SERVER_ERROR.value());
+            resp.setMsg("删除失败,错误信息:"+e.getMessage());
+        }
+        return resp;
     }
 
     /**
@@ -154,6 +175,7 @@ public class AgConfigController {
         dto.setDelFlag(ds.getDel_flag());
         //配置信息
         JSONObject cf = JSON.parseObject( ds.getConfig_values() );
+        if(cf==null) cf=new JSONObject();
         dto.setName(cf.getString("name"));
         dto.setType( cf.getString("type") );
         dto.setClassify(cf.getString("classify"));

@@ -80,14 +80,18 @@ public class AgDataSourceService extends FwService {
      * @param ds
      */
     public void updateDS(AgDataSourceDto ds){
-        AgDataSource dataSource = new AgDataSource();
-        dataSource.setId( ds.getId() );
-        dataSource.setClassify( ds.getClassify() );
-        dataSource.setType( ds.getType() );
-        dataSource.setName( ds.getName() );
-        dataSource.setConfigValue( ds.getConfigValue() );
-        dataSource.setEnable( true );
-        agDataSourceRepository.save(dataSource);
+        if(ds.getDelFlag()){
+            agDataSourceRepository.deleteById(ds.getId());
+        }else {
+            AgDataSource dataSource = new AgDataSource();
+            dataSource.setId( ds.getId() );
+            dataSource.setClassify( ds.getClassify() );
+            dataSource.setType( ds.getType() );
+            dataSource.setName( ds.getName() );
+            dataSource.setConfigValue( ds.getConfigValue() );
+            dataSource.setEnable( true );
+            agDataSourceRepository.save(dataSource);
+        }
         //刷新缓存
         refreshDataSource();
     }

@@ -72,4 +72,10 @@ public class AgConfigService extends FwService {
         //2、刷新缓存
         agJobService.refreshJob();
     }
+
+    public void deleteConfig(AgConfigDto configDto){
+        agJobRepository.deleteByConfigId( configDto.getId() );
+        agConfigRepository.deleteById(configDto.getId());
+        agJobService.refreshJob();
+    }
 }
