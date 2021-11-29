@@ -46,13 +46,16 @@ public class AgDataSourceService extends FwService {
                 for(AgDataSource ds:list){
                     JSONObject config = JSONObject.parseObject( ds.getConfigValue() );
                     //解密在云端加密的数据//会多一些属性，待修改
+                    JSONObject obj = new JSONObject();
                     config.forEach((k,v)->{
                         if(k.startsWith("secret_")){
-                            config.put(k.replace("secret_",""), DecryptUtils.decryptFromHWCloud(v.toString()));
+                            obj.put(k.replace("secret_",""), DecryptUtils.decryptFromHWCloud(v.toString()));
                             //config.remove(k);
+                        }else {
+                            obj.put(k,v);
                         }
                     });
-
+                    config = obj;
                     //api类型数据源处理
                     if( AgConstant.AG_NODETYPE_API.equals( ds.getType() ) ){
                         AgApiTemplate apiTemplate = new AgApiTemplate();
