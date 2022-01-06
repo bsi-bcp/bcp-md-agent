@@ -52,8 +52,8 @@ public class DateUtils{
      * @param pattern 格式
      * @return
      */
-    public static String getDateStrFromTime(String time,String pattern){
-        Date date = new Date(Long.parseLong(time));
+    public static String getDateStrFromTime(long time,String pattern){
+        Date date = new Date(time);
         return DateUtils.toString(date,pattern);
     }
 
