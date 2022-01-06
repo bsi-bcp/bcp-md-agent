@@ -46,6 +46,17 @@ public class DateUtils{
         return df.format( LocalDateTime.now().minusSeconds(minute));
     }
 
+    /**
+     * 把毫秒数转换成指定格式的日期字符串
+     * @param time 毫秒数
+     * @param pattern 格式
+     * @return
+     */
+    public static String getDateStrFromTime(String time,String pattern){
+        Date date = new Date(Long.parseLong(time));
+        return DateUtils.toString(date,pattern);
+    }
+
     public static Date getDate(String dateString,String pattern){
         if(dateString==null){
             return null;
