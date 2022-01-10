@@ -1,14 +1,14 @@
 package com.bsi.utils;
 
-import com.bsi.framework.core.httpclient.common.HttpConfig;
-import com.bsi.framework.core.httpclient.common.HttpHeader;
-import com.bsi.framework.core.httpclient.common.HttpMethods;
-import com.bsi.framework.core.httpclient.common.HttpResult;
+import com.bsi.framework.core.httpclient.builder.HCB;
+import com.bsi.framework.core.httpclient.common.*;
+import com.bsi.framework.core.httpclient.exception.HttpProcessException;
 import com.bsi.framework.core.httpclient.utils.HttpClientUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.http.client.HttpClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,6 @@ public class HttpUtils {
 
     /**
      * 调用http接口工具类
-     * @param method
      * @param url
      * @param headers
      * @param body
@@ -45,7 +44,20 @@ public class HttpUtils {
      * @return AgHttpResult
      */
     public static AgHttpResult request(String method, String url, Map<String,String> headers, String body){
-        HttpConfig config = HttpConfig.simpleCustom(120000);
+        //插件式配置生成HttpClient时所需参数（超时、连接池、ssl、重试）
+        HttpClient client = null;
+        try{
+            HCB hcb = HCB.custom()
+                    .pool(500, 50)    	//启用连接池，每个路由最大创建30个链接，总连接数限制为300个
+                    .sslpv(SSLs.SSLProtocolVersion.TLSv1_2) 	//可设置ssl版本号，默认SSLv3，用于ssl，也可以调用sslpv("TLSv1.2")
+                    .ssl()  			   		//https，支持自定义ssl证书路径和密码，ssl(String keyStorePath, String keyStorepass)
+                    .retry(3);					//重试3次
+            client = hcb.build();
+        }catch (HttpProcessException e){
+            log.info("创建httpclient报错,报错信息:",ExceptionUtils.getFullStackTrace(e));
+        }
+
+        HttpConfig config = HttpConfig.simpleCustom(80000).client(client);
         HttpHeader header = HttpHeader.custom();
         if( MapUtils.isNotEmpty(headers) ){
             for( String key:headers.keySet() ){
