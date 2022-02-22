@@ -53,8 +53,6 @@ public class AgTaskRun extends FwTask {
             info_log.info("====计划任务开始执行,计划任务名称:{}，编码:{}====",name,taskId);
             //1、获取到执行规则
             AgIntegrationConfigVo config = JSON.parseObject( EHCacheUtil.getValue(AgConstant.AG_EHCACHE_JOB,taskId).toString(),AgIntegrationConfigVo.class);
-            info_log.error("configid:{},taskId:{},taskName:{}",config.getConfigId(),config.getTaskId(),config.getTaskName());
-            info_log.error("inputNode:{}",JSON.toJSONString( config.getInputNode() ));
             //2、调用集成引擎解析规则
             AgIntegrationEngine engine = AgEngineFactory.getJobEngine(config);
             Context context = new Context();

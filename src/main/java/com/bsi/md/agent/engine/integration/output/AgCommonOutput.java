@@ -5,12 +5,14 @@ import com.bsi.md.agent.engine.integration.Context;
 import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
 import com.bsi.utils.JSONUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 通用输出节点
  */
-@Slf4j
 public class AgCommonOutput implements AgOutput{
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
     //脚本
     protected String script;
 
@@ -18,9 +20,9 @@ public class AgCommonOutput implements AgOutput{
     public Object write(Context context) throws Exception{
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"output",new Object[]{context,context.getData()});
+            result = new AgJavaScriptEngine().execute(script,"output",new Object[]{context,context.getData()});
         }catch (Exception e){
-            log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
+            info_log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
             throw e;
         }
         return result;

@@ -4,13 +4,15 @@ import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.engine.integration.Context;
 import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * js脚本转换
  * @author fish
  */
-@Slf4j
 public class AgJsScriptTransform implements AgTransform{
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
     //脚本
     protected String script;
     /**
@@ -21,9 +23,9 @@ public class AgJsScriptTransform implements AgTransform{
     public Object transform(Context context) throws Exception{
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"transform",new Object[]{context,context.getData()});
+            result = new AgJavaScriptEngine().execute(script,"transform",new Object[]{context,context.getData()});
         }catch (Exception e){
-            log.error("转换数据报错:{}", ExceptionUtils.getFullStackTrace(e));
+            info_log.error("转换数据报错:{}", ExceptionUtils.getFullStackTrace(e));
             throw e;
         }
         return result;
