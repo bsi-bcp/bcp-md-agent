@@ -43,7 +43,7 @@
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 每天日志归档路径以及格式 -->
-            <fileNamePattern>${log.path}/info/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/info/backup/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>20MB</maxFileSize>
             <!--日志文档保留天数-->
             <maxHistory>15</maxHistory>
@@ -69,7 +69,7 @@
         </encoder>
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/error/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/error/backup/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>20MB</maxFileSize>
             <!--日志文档保留天数-->
             <maxHistory>15</maxHistory>
@@ -97,7 +97,7 @@
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 每天日志归档路径以及格式 -->
-            <fileNamePattern>${log.path}/callOtherInterface/callOtherInterface.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/callOtherInterface/backup/callOtherInterface.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>20MB</maxFileSize>
             <!--日志文档保留天数-->
             <maxHistory>15</maxHistory>
@@ -129,7 +129,7 @@
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 每天日志归档路径以及格式 -->
-            <fileNamePattern>${log.path}/taskRun/taskRun.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/taskRun/backup/taskRun.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 20MB, keep 60 days worth of history, but at most 20GB -->
             <maxFileSize>20MB</maxFileSize>
             <!--日志文件最大占用空间-->
@@ -163,7 +163,7 @@
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 每天日志归档路径以及格式 -->
-            <fileNamePattern>${log.path}/auditRun/auditRun.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/auditRun/backup/auditRun.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 20MB, keep 60 days worth of history, but at most 20GB -->
             <maxFileSize>20MB</maxFileSize>
             <!--日志文件最大占用空间-->
@@ -200,7 +200,7 @@
                 <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
                 <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                     <!-- 每天日志归档路径以及格式 -->
-                    <fileNamePattern>${log.path}/task/task-${taskId}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                    <fileNamePattern>${log.path}/task/backup/task-${taskId}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
                     <maxFileSize>30MB</maxFileSize>
                     <!--日志文档保留天数-->
                     <maxHistory>60</maxHistory>
@@ -251,7 +251,7 @@
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="INFO_FILE" />
         <appender-ref ref="ERROR_FILE" />
-        <!-- <appender-ref ref="sitInfo" /> -->
+<!--         <appender-ref ref="sitInfo" />-->
     </root>
 
     <!-- 4.2 生产环境:输出到文档

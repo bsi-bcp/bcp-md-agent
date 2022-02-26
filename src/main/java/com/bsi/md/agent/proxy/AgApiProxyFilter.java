@@ -2,8 +2,6 @@ package com.bsi.md.agent.proxy;//package com.bsi.framework.core.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.bsi.framework.app.controller.FwTokenController;
-import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.framework.core.utils.TokenUtils;
@@ -18,6 +16,8 @@ import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.utils.AgApiProxyUtils;
 import com.bsi.md.agent.utils.AgConfigUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.*;
@@ -36,6 +36,8 @@ import java.util.UUID;
 @Slf4j
 @WebFilter(filterName="agApiProxyFilter",urlPatterns="/*")
 public class AgApiProxyFilter implements Filter {
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
@@ -52,7 +54,7 @@ public class AgApiProxyFilter implements Filter {
             return;
         }
         MDC.put("taskId", config.getTaskName()+"-"+config.getTaskId());
-        log.info("====开始调用{}====",config.getTaskName());
+        info_log.info("====开始调用{}====",config.getTaskName());
         JSONObject inputNode = config.getInputNode();
         //如果接口需要登录鉴权,则进行验证
         if( "y".equals( inputNode.getString("authFlag") ) ){
@@ -62,7 +64,7 @@ public class AgApiProxyFilter implements Filter {
                 response.setStatus(resp.getCode());
                 response.getWriter().write( JSON.toJSONString(resp) );
                 response.getWriter().close();
-                log.info("接口鉴权失败");
+                info_log.info("接口鉴权失败");
                 return;
             }
         }
@@ -96,9 +98,9 @@ public class AgApiProxyFilter implements Filter {
             resp.setErrorCodeAndMsg(FwHttpStatus.INTERNAL_SERVER_ERROR.value(),"接口异常,异常id:"+errorId);
             response.getWriter().write( JSON.toJSONString(resp) );
             response.getWriter().close();
-            log.error("代理api接口发生错误,errorId:{},错误信息:{}",errorId,ExceptionUtils.getFullStackTrace(e));
+            info_log.error("代理api接口发生错误,errorId:{},错误信息:{}",errorId,ExceptionUtils.getFullStackTrace(e));
         }finally {
-            log.info("===={}调用完毕====",config.getTaskName());
+            info_log.info("===={}调用完毕====",config.getTaskName());
             MDC.remove("taskId");
         }
 

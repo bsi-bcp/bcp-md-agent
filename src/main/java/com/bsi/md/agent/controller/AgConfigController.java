@@ -307,7 +307,7 @@ public class AgConfigController {
             error = ExceptionUtils.getFullStackTrace( e );
             info_log.error( "计划任务:{},执行失败,失败信息:{}" , param.getTaskId() ,error );
         }finally {
-            info_log.info( "====计划任务:{},执行结束,执行结果:{}====", param.getTaskId() , result );
+            info_log.info( "====手动执行计划任务:{},执行结束,执行结果:{}====", param.getTaskId() , result );
             MDC.remove("taskId");
         }
         return resp;
