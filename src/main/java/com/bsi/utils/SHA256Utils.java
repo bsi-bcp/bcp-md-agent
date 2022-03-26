@@ -1,8 +1,10 @@
 package com.bsi.utils;
 
+import com.bsi.framework.core.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -75,5 +77,15 @@ public class SHA256Utils {
 	 */
 	private static String base_64(byte[] bytes) {
 		return new String(Base64.encodeBase64(bytes));
+	}
+
+	public static byte[] base_64_decode_bytes(byte[] bytes) {
+		return Base64.decodeBase64(bytes);
+	}
+	public static byte[] base_64_decode_bytes(String string) {
+		return base_64_decode_bytes(string.getBytes());
+	}
+	public static byte[] toBytes(String str,String charset){
+		return StringUtils.isEmpty(charset) ? str.getBytes():str.getBytes(Charset.forName(charset));
 	}
 }
