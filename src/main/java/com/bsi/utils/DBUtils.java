@@ -3,6 +3,9 @@ package com.bsi.utils;
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.datasource.AgJdbcTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * sql语句执行工具类,支持对数据库的增删改查
  * @author fish
@@ -51,8 +54,13 @@ public class DBUtils {
      * @param dataSourceId 数据源id
      * @return int 更新数量
      */
-//    public static int executeBatch(String sql,Object[] args,Integer dataSourceId){
-//        AgJdbcTemplate template = AgDatasourceContainer.getJdbcDataSource(dataSourceId);
-//        return template.getJdbcTemplate().ba
-//    }
+    public static int[] executeBatch(String sql, List<List<Object>> args, String dataSourceId){
+        AgJdbcTemplate template = AgDatasourceContainer.getJdbcDataSource(dataSourceId);
+        List<Object[]> list = new ArrayList<>();
+        args.forEach(
+               objects ->  list.add(objects.toArray())
+        );
+        return template.getJdbcTemplate().batchUpdate(sql, list);
+    }
+
 }
