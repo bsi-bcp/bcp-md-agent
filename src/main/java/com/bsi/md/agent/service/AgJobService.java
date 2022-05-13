@@ -95,7 +95,7 @@ public class AgJobService extends FwService {
             FwScheduleUtils.clearAndAddTasks(taskList);
             FwScheduleUtils.refreshTasks();
 
-            //4、实时接口初始化 TODO test
+            //4、实时接口初始化
             if (CollectionUtils.isNotEmpty(apiProxyList)) {
                 apiSize = apiProxyList.size();
                 for(AgApiProxy api : apiProxyList){
