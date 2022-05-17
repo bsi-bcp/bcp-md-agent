@@ -1,6 +1,8 @@
 package com.bsi.md.agent.engine.integration;
 
 import com.bsi.md.agent.constant.AgConstant;
+import com.bsi.md.agent.engine.plugins.AgAfterOutputPluginManager;
+import com.bsi.md.agent.engine.plugins.AgTaskErrorDataWarnPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,8 @@ public class AgTaskBootStrap {
         context.put(AgConstant.AG_DATA,obj);
         info_log.debug("3.执行输出节点");
         Object result = engine.output(context);
+        info_log.debug("4.执行输出完成之后的插件");
+        AgAfterOutputPluginManager.runPlugins(context);
         info_log.debug("执行完毕");
         return result;
     }

@@ -70,4 +70,30 @@ public class Context {
     public Object get(String key){
         return env.get(key);
     }
+    public String getTaskId(){
+        return (String) env.get("ctx_task_id");
+    }
+
+    /**
+     * 读取任务错误数据
+     * @return
+     */
+    public String getTaskErrorData(){
+        return (String) env.get("ctx_task_error_data");
+    }
+    /**
+     * 读取告警配置
+     * @return
+     */
+    public String getWarnMethodId(){
+        return (String) env.get("ctx_warn_method_id");
+    }
+
+    /**
+     * 设置任务错误数据
+     * @param data
+     */
+    public void setErrorData(String data){
+        env.put("ctx_task_error_data",data);
+    }
 }

@@ -20,7 +20,6 @@ public class AgEmailService {
 	 */
 	public void sendEmail(AgEmailEntity email){
 		SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-		//Map<String, String> configMap = fwProplistService.getPropListMap("fw.email.config");
 		simpleMailMessage.setFrom(javaMailSenderImpl.getJavaMailProperties().getProperty("bcp.mail.from"));
 		String receiver = email.getReceiver();
 		String receivers[] = receiver.split(";");

@@ -21,4 +21,5 @@ public class AgWarnMethod extends AgAbstractEntity {
     @Column(name = "configValue",columnDefinition="ntext")
     private String configValue;
 
+    private Boolean enable;
 }

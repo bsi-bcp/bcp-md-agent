@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * @author fish
  */
 @Component
-public interface AgJobRepository extends JpaRepository<AgJob, Long> {
+public interface AgJobRepository extends JpaRepository<AgJob, String> {
 
     Integer deleteByConfigId(String configId);
 }

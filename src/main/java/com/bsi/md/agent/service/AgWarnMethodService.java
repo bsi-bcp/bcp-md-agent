@@ -1,6 +1,7 @@
 package com.bsi.md.agent.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.bsi.framework.core.service.FwService;
 import com.bsi.framework.core.utils.CollectionUtils;
 import com.bsi.framework.core.utils.EHCacheUtil;
@@ -12,12 +13,14 @@ import com.bsi.md.agent.entity.dto.AgTaskWarnConfDto;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.repository.AgJobRepository;
 import com.bsi.md.agent.repository.AgWarnMethodRepository;
+import com.bsi.utils.JSONUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -47,7 +50,10 @@ public class AgWarnMethodService extends FwService {
             if( CollectionUtils.isNotEmpty(list) ) {
                 size = list.size();
                 for (AgWarnMethod agWarnMethod : list) {
-                    EHCacheUtil.setValue(AgConstant.AG_EHCACHE_WARN,agWarnMethod.getId(),agWarnMethod);
+                    //启用的才初始化
+                    if( agWarnMethod.getEnable() ){
+                        EHCacheUtil.setValue(AgConstant.AG_EHCACHE_WARN,agWarnMethod.getId(), JSONUtils.toJson(agWarnMethod));
+                    }
                 }
             }
         }catch (Exception e){
@@ -65,12 +71,11 @@ public class AgWarnMethodService extends FwService {
      */
     public void updateTaskAndMethod(AgTaskWarnConfDto warnConf,AgIntegrationConfigVo config){
         //保存或者修改告警方式
-        AgWarnMethod m = JSON.parseObject(warnConf.getWarnMethod(),AgWarnMethod.class);
+        AgWarnMethod m = JSON.parseArray(warnConf.getWarnMethod(),AgWarnMethod.class).get(0);
         agWarnMethodRepository.save(m);
-
+        //String methodIds = mlist.stream().map(a->a.getId()).collect(Collectors.joining(","));
         //修改任务中的告警方式
-        AgJob job = new AgJob();
-        job.setId(warnConf.getTaskId());
+        AgJob job = agJobRepository.getOne(warnConf.getTaskId());
         job.setWarnMethodId(m.getId());
         agJobRepository.save(job);
 

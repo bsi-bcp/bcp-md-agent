@@ -238,22 +238,6 @@ public class XmlUtils {
         }
     }
     public static  void main(String[] ars) throws Exception{
-        String xml="<Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-                "    <Header>\n" +
-                "        <ns0:Urc xmlns:ns0=\"http://ws.uap.nc/lang\">\n" +
-                "            <ns0:datasource>design</ns0:datasource>\n" +
-                "            <ns0:corpCode>1001</ns0:corpCode>\n" +
-                "            <ns0:userCode>#UAP#</ns0:userCode>\n" +
-                "            <ns0:langCode>simpchn</ns0:langCode>\n" +
-                "        </ns0:Urc>\n" +
-                "    </Header>\n" +
-                "    <Body>\n" +
-                "        <ns1:saveOrUpdateResponse xmlns:ns1=\"http://net.sm.itf.nc/INetWebserviceServer\">\n" +
-                "            <return>{\"successResult\":{\"data\":[{\"pk_supplierprice\":\"1001A5100000004ODKV3\",\"vbdef1\":\"1\",\"ts\":\"2022-04-19 17:51:16\"}]},\"failResult\":{\"data\":[],\"failMsg\":\"\"}}</return>\n" +
-                "        </ns1:saveOrUpdateResponse>\n" +
-                "    </Body>\n" +
-                "</Envelope>";
-        System.out.println( getTextByPath(xml,"//return") ) ;
        // log.info( XmlUtils.xml2json(xml,"Envelope") );
 
 //        String xml = "<ufinterface billtype=\"supplier\" filename=\"supplier17ca11026ee0000zhenyun.xml\" isexchange=\"Y\" replace=\"Y\" roottag=\"sendresult\" sender=\"zhenyun\" successful=\"N\">\n" +

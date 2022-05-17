@@ -317,11 +317,12 @@ public class AgConfigController {
     private Resp warnConfig(AgTaskWarnConfDto warnConf){
         Resp resp = new Resp();
         //1、获取到执行规则
-        AgIntegrationConfigVo config = JSON.parseObject( EHCacheUtil.getValue(AgConstant.AG_EHCACHE_JOB,warnConf.getTaskId()).toString(),AgIntegrationConfigVo.class);
-        if(config==null){
-            resp.setErrorCodeAndMsg(500,"前置机未找到taskId为{}的任务！");
+        Object obj = EHCacheUtil.getValue(AgConstant.AG_EHCACHE_JOB,warnConf.getTaskId());
+        if(obj==null){
+            resp.setErrorCodeAndMsg(500,"前置机未找到taskId为"+warnConf.getTaskId()+"的任务！");
             return resp;
         }
+        AgIntegrationConfigVo config = JSON.parseObject( obj.toString(),AgIntegrationConfigVo.class);
         agWarnMethodService.updateTaskAndMethod(warnConf,config);
         return resp;
     }

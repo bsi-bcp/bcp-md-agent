@@ -75,6 +75,9 @@ public class AgTaskRun extends FwTask {
             context.put("outputConfig",config.getOutputNode());
             context.put("transformConfig",config.getTransformNode());
             context.put("taskInfoLog",agTaskLog);
+            context.put("ctx_task_id",taskId);
+            context.put("ctx_warn_method_id",config.getWarnMethodId());
+
             AgTaskBootStrap.custom().context(context).engine(engine).exec();
         }catch (Exception e){
             result = "failure";
