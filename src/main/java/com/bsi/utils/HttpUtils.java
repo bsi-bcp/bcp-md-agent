@@ -44,31 +44,7 @@ public class HttpUtils {
         ar.setResult(result.getBody());
         return ar;
     }
-
-//    public static void main(String[] args) {
-//        Map<String,String> map = new HashMap<>();
-//        map.put("Authorization","Bearer 86f574cb-d694-45f7-848c-0b774e50e0a9");
-//        map.put("Content-Type","application/json");
-//        String str="{\n" +
-//                "    \"header\": {\n" +
-//                "        \"applicationCode\": \"GOINGLINK_CLOUD_TEST\",\n" +
-//                "        \"applicationGroupCode\": \"PUBLIC_CLOUD\",\n" +
-//                "        \"batchNum\": 128278325,\n" +
-//                "        \"externalSystemCode\": \"CFYX_AXKD912DX0S\",\n" +
-//                "        \"interfaceCode\": \"SPRM_SOURCE_RESULT_EXP_QUERY\",\n" +
-//                "        \"userName\": \"\"\n" +
-//                "    },\n" +
-//                "    \"body\": {\n" +
-//                "        \"page\": 0,\n" +
-//                "        \"size\": 200,\n" +
-//                "        \"dateFrom\": \"2020-03-20 00:00:00\",\n" +
-//                "        \"dateTo\": \"2022-06-20 00:00:00\"\n" +
-//                "   }\n" +
-//                "}";
-//        AgHttpResult rs = HttpUtils.postByRestTemplate("https://test.isrm.going-link.com/sitf/v1/source-exps/price-lib/pull",map,str);
-//        System.out.println("code:"+rs.getCode()+";value:"+rs.getResult());
-//    }
-
+    
     /**
      * 调用http接口工具类
      * @param url
