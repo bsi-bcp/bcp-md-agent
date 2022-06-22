@@ -353,6 +353,7 @@ public class AgConfigController {
             Map<String,Object> paramMap = config.getParamMap();
             paramMap.put("repairParam",param);
             context.put("config", paramMap);
+            context.put("repair-flag","Y");
             //处理输入、输出、转换节点的配置
             AgConfigUtils.rebuildNode(config);
             context.put("inputConfig",config.getInputNode());

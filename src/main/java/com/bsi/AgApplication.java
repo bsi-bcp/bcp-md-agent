@@ -32,6 +32,9 @@ public class AgApplication {
     @Bean
     public HttpMessageConverters fastJsonHttpMessageConverters() {
 
+        //设置ehcache缓存关闭之后持久化到磁盘
+        System.setProperty("net.sf.ehcache.enableShutdownHook","true");
+
         // 1、需要先定义一个 convert 转换消息的对象;
         FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
 

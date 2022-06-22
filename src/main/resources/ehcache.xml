@@ -5,7 +5,7 @@
   
   	<!-- diskStore：ehcache其实是支持内存+磁盘+堆外内存，几个层级的缓存 -->
   	<!-- 在这里设置一下，但是一般不用的 -->
-    <diskStore path="java.io.tmpdir/Tmp_EhCache" />
+    <diskStore path="/db" />
     
     <!-- defaultCache，是默认的缓存策略 -->
     <!-- 如果你指定的缓存策略没有找到，那么就用这个默认的缓存策略 -->
@@ -68,4 +68,15 @@
             timeToIdleSeconds="0"
             timeToLiveSeconds="0"
             memoryStoreEvictionPolicy="LRU" />
+
+    <!-- 任务最后成功运行时间 -->
+    <cache
+            name="task_last_success_time"
+            eternal="true"
+            maxElementsInMemory="1"
+            overflowToDisk="true"
+            diskPersistent="true"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="0" />
+
 </ehcache>

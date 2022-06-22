@@ -75,6 +75,14 @@ public class Context {
     }
 
     /**
+     * 读取最后一次运行成功处理数据的时间
+     * @return
+     */
+    public String getTaskTs(){
+        return (String) env.get("ctx_task_last_success_ts");
+    }
+
+    /**
      * 读取任务错误数据
      * @return
      */
