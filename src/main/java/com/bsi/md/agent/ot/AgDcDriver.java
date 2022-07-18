@@ -6,9 +6,12 @@ import com.huaweicloud.sdk.iot.module.ModuleShadowNotificationCallback;
 import com.huaweicloud.sdk.iot.module.PointsCallback;
 import com.huaweicloud.sdk.iot.module.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 
 @Slf4j
+@Component
 public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallback {
 
     /**
@@ -18,7 +21,7 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
 
     @PostConstruct
     void init() throws Exception {
-
+        log.info("初始化dcClient");
         //打开客户端
         dcClient = DcClient.createFromEnv();
         dcClient.open();
