@@ -23,11 +23,14 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
     void init() throws Exception {
         log.info("初始化dcClient");
         //打开客户端
-        dcClient = DcClient.createFromEnv();
-        dcClient.open();
-        //设置回调，并同步模块影子
-        dcClient.setPointsCallback(this);
-        dcClient.startModuleShadow(this);
+        try {
+            dcClient = DcClient.createFromEnv();
+            dcClient.open();
+            //设置回调，并同步模块影子
+            dcClient.setPointsCallback(this);
+            dcClient.startModuleShadow(this);
+        }catch (Exception ignored) {
+        }
     }
 
     /**
