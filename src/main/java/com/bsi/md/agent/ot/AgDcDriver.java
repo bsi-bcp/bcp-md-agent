@@ -52,10 +52,12 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
         JSONObject obj = JSON.parseObject( JSON.toJSONString(shadow) );
         JSONObject defaultValue = obj.getJSONObject("properties").getJSONObject("default_values");
         //初始化数据源
-        JSONObject otParam = obj.getJSONObject("connection_info");
+        JSONObject otParam = obj.getJSONObject("properties").getJSONObject("connection_info");
+        log.info("otParam:{}",otParam.toJSONString());
         JSONArray dsArr = defaultValue.getJSONArray("bcp_ds");
         for(int i=0;i<dsArr.size();i++){
             AgDataSourceDto dto = JSON.parseObject(dsArr.getString(i),AgDataSourceDto.class);
+            log.info("dsDto:{}",JSON.toJSONString(dto));
             JSONObject cfv = JSON.parseObject(dto.getConfigValue());
             if(cfv.size()>0){
                 log.info("进行属性替换");
