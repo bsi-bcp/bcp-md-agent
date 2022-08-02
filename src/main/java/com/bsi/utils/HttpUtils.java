@@ -101,7 +101,7 @@ public class HttpUtils {
         headers.put("Content-Type","application/x-www-form-urlencoded");
         return request2("POST",url,headers,params);
     }
-    
+
     /**
      * 调用http接口工具类
      * @param method

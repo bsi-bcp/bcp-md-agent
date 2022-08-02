@@ -103,7 +103,6 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             Iterator<JCoField> iterator = tables.iterator();
             while (iterator.hasNext()){
                 JCoField j = iterator.next();
-                info_log.info("name:{}", j.toString(),j.getName());
                 JCoTable tb = j.getTable();
                 JSONArray detail = new JSONArray();
                 for (int i = 0; i < tb.getNumRows(); i++) {
