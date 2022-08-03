@@ -11,6 +11,7 @@ import com.bsi.md.agent.constant.AgConstant;
 import com.bsi.md.agent.datasource.*;
 import com.bsi.md.agent.entity.AgDataSource;
 import com.bsi.md.agent.entity.dto.AgDataSourceDto;
+import com.bsi.md.agent.ot.AgDcDriver;
 import com.bsi.md.agent.repository.AgDataSourceRepository;
 import com.bsi.md.agent.utils.AgJasyptUtils;
 import com.bsi.utils.DecryptUtils;
@@ -30,6 +31,9 @@ import java.util.Map;
 public class AgDataSourceService extends FwService {
     @Autowired
     private AgDataSourceRepository agDataSourceRepository;
+
+    @Autowired
+    private AgDcDriver agDcDriver;
 
     /**
      * 查询所有数据源配置
@@ -69,7 +73,16 @@ public class AgDataSourceService extends FwService {
                         JSONObject prop = new JSONObject();
                         for(int i=0;i<global.size();i++){
                             JSONObject o = global.getJSONObject(i);
-                           prop.put( o.getString("key"),o.getBooleanValue("secret")?AgJasyptUtils.decode(AgJasyptUtils.PWD,o.getString("value")):o.getString("value"));
+                            String value = o.getString("value");
+                            if(o.getBooleanValue("secret")){
+                                //如果是ot下发的配置则使用华为加密算法解密
+                                if(StringUtils.hasText( o.getString("source") ) && "ot".equals(o.getString("source"))){
+                                    value = agDcDriver.getDcClient().decryptDataFromCloud(value);
+                                }else {
+                                    value = AgJasyptUtils.decode(AgJasyptUtils.PWD,value);
+                                }
+                            }
+                           prop.put( o.getString("key"),value );
                         }
                         AgDatasourceContainer.setDSProperties(ds.getId(),prop);
                     }

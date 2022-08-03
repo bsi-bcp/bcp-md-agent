@@ -1,5 +1,7 @@
 package com.bsi.md.agent.datasource;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.sap.AgRFCManager;
 import com.sap.conn.jco.*;
@@ -8,6 +10,8 @@ import lombok.Data;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -72,14 +76,15 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
         AgRFCManager.ping(destName);
         jCoDestination = AgRFCManager.getDestination(destName);
     }
+
     /**
-     * 执行jco函数
+     * 执行jco查询函数
      * @param functionName
      * @param param
      * @return
      */
-    public Object executeFunction(String functionName, Map<String,Object> param){
-        Object result = null;
+    public Object executeQuery(String functionName, Map<String,Object> param){
+        JSONObject resultObj = new JSONObject(true);
         try{
             JCoFunction function = jCoDestination.getRepository().getFunction(functionName);
             //设置参数
@@ -90,23 +95,29 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 });
             }
             function.execute(jCoDestination);
-            result = function.getExportParameterList().toString();
             // 获取RFC返回的字段值
-//            JCoParameterList exportParam = function.getExportParameterList();
-//            JCoParameterFieldIterator it = exportParam.getParameterFieldIterator();
-            // 遍历RFC返回的表对象 TODO 字段和结果是否正确
-//            JCoTable tb = function.getTableParameterList().getTable("RESULT_NAME");
-//            for (int i = 0; i < tb.getNumRows(); i++) {
-//                tb.setRow(i);
-//                JSONObject obj = new JSONObject();
-//                tb.forEach(f->{
-//                    obj.put(f.getName(),f.getString());
-//                });
-//                list.add(obj);
-//            }
+            JCoParameterList exportParam = function.getExportParameterList();
+            JCoParameterFieldIterator it = exportParam.getParameterFieldIterator();
+            // 遍历RFC返回的表对象
+            JCoParameterList tables = function.getTableParameterList();
+            Iterator<JCoField> iterator = tables.iterator();
+            while (iterator.hasNext()){
+                JCoField j = iterator.next();
+                JCoTable tb = j.getTable();
+                JSONArray detail = new JSONArray();
+                for (int i = 0; i < tb.getNumRows(); i++) {
+                    tb.setRow(i);
+                    JSONObject obj = new JSONObject();
+                    tb.forEach(f->{
+                        obj.put(f.getName(),f.getString());
+                    });
+                    detail.add(obj);
+                }
+                resultObj.put(j.getName(),detail);
+            }
         }catch (Exception e){
             info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         }
-        return result;
+        return resultObj;
     }
 }
