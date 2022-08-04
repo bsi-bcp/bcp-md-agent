@@ -7,15 +7,13 @@ import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.sap.AgRFCManager;
 import com.sap.conn.jco.*;
 import com.sap.conn.jco.ext.DestinationDataProvider;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import lombok.Data;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * sapRfc类型数据源模板
@@ -136,16 +134,19 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             Set<Map.Entry<String, Object>> entries = param.entrySet();
             int row=1;
             for (Map.Entry<String, Object> entity:entries) {
-                info_log.info("k:{},v:{},i:{}",entity.getKey(),entity.getValue(),row);
-                JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
-                JSONArray arr = JSON.parseArray(JSON.toJSONString(entity.getValue()));
-                for (int j=0;j>arr.size();j++){
-                    JSONObject obj = arr.getJSONObject(j);
-                    obj.forEach((k,v)->{
-                        inputTable.setValue(k,v);
-                    });
+                if(entity.getValue() instanceof ScriptObjectMirror){
+                    Collection<Object> a = ((ScriptObjectMirror) entity.getValue()).values();
+                    JSONArray arr = JSONArray.parseArray( JSON.toJSONString(a) );
+                    info_log.info("k:{},i:{}",entity.getKey(),row);
+                    JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
+                    for (int j=0;j>arr.size();j++){
+                        JSONObject obj = arr.getJSONObject(j);
+                        obj.forEach((k,v)->{
+                            inputTable.setValue(k,v);
+                        });
+                    }
+                    inputTable.insertRow(row++);
                 }
-                inputTable.insertRow(row++);
             }
             function.execute(jCoDestination);
             // 获取RFC返回的字段值
