@@ -146,17 +146,20 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 }
             }
             function.execute(jCoDestination);
-            info_log.info("function:{}",function.toString());
-            info_log.info("exportParam:{}",function.toXML());
             // 遍历RFC返回的表对象
             function.getExportParameterList();
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
+            if(function.getTableParameterList().getTable("ZRXXS_RES_SK")!=null){
+                info_log.info("t1:{}",function.getTableParameterList().getTable("ZRXXS_RES_SK").isEmpty());
+            }
+            if(function.getTableParameterList().getTable("ET_RETURN")!=null){
+                info_log.info("t2:{}",function.getTableParameterList().getTable("ET_RETURN").isEmpty());
+            }
             while (iterator.hasNext()){
                 JCoField j = iterator.next();
                 JCoTable tb = j.getTable();
                 info_log.info("JCoField:{}",j.getName());
-                info_log.info("tb:{}",tb.toString());
                 info_log.info("numRows:{}",tb.getNumRows());
                 info_log.info("row:{}",tb.getRow());
 //                info_log.info("recordField:{}",tb.getRecordFieldIterator().hasNextField());
@@ -173,6 +176,7 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                     detail.add(obj);
                     flag = tb.nextRow();
                 }
+                info_log.info("tb:{}",tb.toString());
 //                for (int i = 0; i < tb.getNumRows(); i++) {
 //                    tb.setRow(i);
 //                    JSONObject obj = new JSONObject();
