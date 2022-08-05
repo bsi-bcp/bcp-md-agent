@@ -97,6 +97,7 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             }
             function.execute(jCoDestination);
             // 遍历RFC返回的表对象
+            function.getExportParameterList();
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
             while (iterator.hasNext()){
@@ -148,29 +149,6 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             function.execute(jCoDestination);
             info_log.info("function:{}",function.toString());
             info_log.info("exportParam:{}",function.toXML());
-            if(function.getExportParameterList()!=null){
-                info_log.info("exportParams.....");
-                info_log.info("exportParam:{}",function.getExportParameterList());
-                JCoParameterList tbs3 = function.getExportParameterList();
-                Iterator<JCoField> iterator = tbs3.iterator();
-                while (iterator.hasNext()){
-                    JCoField j = iterator.next();
-                    JCoTable tb = j.getTable();
-                    info_log.info("JCoField:{}",j.getName());
-                    info_log.info("tb:{}",tb.toString());
-                    info_log.info("numRows:{}",tb.getNumRows());
-                    JSONArray detail = new JSONArray();
-                    for (int i = 0; i < tb.getNumRows(); i++) {
-                        tb.setRow(i);
-                        JSONObject obj = new JSONObject();
-                        tb.forEach(f->{
-                            obj.put(f.getName(),f.getString());
-                        });
-                        detail.add(obj);
-                    }
-                    resultObj.put(j.getName(),detail);
-                }
-            }
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
@@ -180,15 +158,29 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 info_log.info("JCoField:{}",j.getName());
                 info_log.info("tb:{}",tb.toString());
                 info_log.info("numRows:{}",tb.getNumRows());
+                info_log.info("row:{}",tb.getRow());
+//                info_log.info("recordField:{}",tb.getRecordFieldIterator().hasNextField());
+//                info_log.info("itNext:{}",tb.iterator().hasNext());
+                info_log.info("empty:{}",tb.isEmpty());
+
                 JSONArray detail = new JSONArray();
-                for (int i = 0; i < tb.getNumRows(); i++) {
-                    tb.setRow(i);
+                boolean flag = !tb.isEmpty();
+                while (flag){
                     JSONObject obj = new JSONObject();
                     tb.forEach(f->{
                         obj.put(f.getName(),f.getString());
                     });
                     detail.add(obj);
+                    flag = tb.nextRow();
                 }
+//                for (int i = 0; i < tb.getNumRows(); i++) {
+//                    tb.setRow(i);
+//                    JSONObject obj = new JSONObject();
+//                    tb.forEach(f->{
+//                        obj.put(f.getName(),f.getString());
+//                    });
+//                    detail.add(obj);
+//                }
                 resultObj.put(j.getName(),detail);
             }
         }catch (Exception e){
