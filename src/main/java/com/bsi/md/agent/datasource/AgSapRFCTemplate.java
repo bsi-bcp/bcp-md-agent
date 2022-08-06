@@ -128,26 +128,28 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
     public Object execute(String functionName, Map<String,Object> param){
         JSONObject resultObj = new JSONObject(true);
         try{
+            JCoContext.begin(jCoDestination);
             JCoFunction function = jCoDestination.getRepository().getFunction(functionName);
             Set<Map.Entry<String, Object>> entries = param.entrySet();
-            int row=1;
             for (Map.Entry<String, Object> entity:entries) {
                 if(entity.getValue() instanceof ScriptObjectMirror){
                     Collection<Object> a = ((ScriptObjectMirror) entity.getValue()).values();
                     JSONArray arr = JSONArray.parseArray( JSON.toJSONString(a) );
                     JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
                     for (int j=0;j>arr.size();j++){
-                        inputTable.insertRow(row++);
+                        inputTable.appendRow();
                         JSONObject obj = arr.getJSONObject(j);
-                        obj.forEach((k,v)->{
-                            inputTable.setValue(k,v);
-                        });
+                        obj.forEach((k,v)->
+                            inputTable.setValue(k,v)
+                        );
                     }
                 }
             }
             function.execute(jCoDestination);
             // 遍历RFC返回的表对象
-            function.getExportParameterList();
+            if(function.getExportParameterList()!=null){
+                info_log.info("exportList:{}",function.getExportParameterList().toXML());
+            }
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
             info_log.info("tables:{}",tables.toXML());
@@ -190,6 +192,7 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
 //                }
                 resultObj.put(j.getName(),detail);
             }
+            JCoContext.end(jCoDestination);
         }catch (Exception e){
             info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         }
