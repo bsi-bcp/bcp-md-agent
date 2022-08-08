@@ -128,6 +128,7 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 resultObj.put(j.getName(),detail);
             }
         }catch (Exception e){
+            resultObj.put("sapError",e.getMessage());
             info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         }
         return resultObj;
