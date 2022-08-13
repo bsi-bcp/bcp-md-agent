@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim
+FROM openjdk:8-jre-alpine
 MAINTAINER fish
 
 ENV TZ=Asia/Shanghai
