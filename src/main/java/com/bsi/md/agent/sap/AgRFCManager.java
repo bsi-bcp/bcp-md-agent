@@ -4,7 +4,6 @@ import com.bsi.framework.core.utils.ExceptionUtils;
 import com.sap.conn.jco.*;
 import com.sap.conn.jco.ext.Environment;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Properties;
 
 /**
@@ -14,9 +13,6 @@ import java.util.Properties;
 @Slf4j
 public class AgRFCManager
 {
-    private static String ABAP_AS_POOLED = "ABAP_AS_POOL";
-
-
     private static AgDestinationDataProvider provider = null;
     private static JCoDestination destination = null;
 
