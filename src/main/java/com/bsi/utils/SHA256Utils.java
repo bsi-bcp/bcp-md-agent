@@ -73,6 +73,35 @@ public class SHA256Utils {
 	}
 
 	/**
+	 * 加密传入的字符串
+	 *
+	 * @param key  密钥key
+	 * @param body 加密字符串
+	 * @param name 加密方法名
+	 * @return 加密结果
+	 */
+	public static String generateSignature_UTF(String key, String body, String name)
+			throws InvalidKeyException, NoSuchAlgorithmException, IllegalStateException {
+		return base_64(hMacMD5(key, body, name));
+	}
+
+	/**
+	 * hamc加密算法
+	 *
+	 * @param macKey  秘钥key
+	 * @param macData 加密内容-响应消息体
+	 * @param name 加密方法名
+	 * @return 加密密文
+	 */
+	private static byte[] hMacMD5(String macKey, String macData, String name)
+			throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException {
+		SecretKeySpec secret = new SecretKeySpec(macKey.getBytes(), name);
+		Mac mac = Mac.getInstance(name);
+		mac.init(secret);
+		return mac.doFinal(macData.getBytes(StandardCharsets.UTF_8));
+	}
+
+	/**
 	 * 字节数组转字符串
 	 *
 	 * @param bytes 字节数组
