@@ -26,6 +26,17 @@ public class DateUtils{
     }
 
     /**
+     * 获取当前日期多少天之前的日期，为负数可以获取多少分钟之后的数据
+     * @param pattern
+     * @param day
+     * @return String
+     */
+    public static String preDayForNow(Long day,String pattern){
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        return df.format( LocalDateTime.now().minusDays(day));
+    }
+
+    /**
      * 获取当前日期多少分钟之前的日期，为负数可以获取多少分钟之后的数据
      * @param pattern
      * @param minute
@@ -96,6 +107,12 @@ public class DateUtils{
         return preTime(date,5,preDays);
     }
 
+    /**
+     * @param date
+     * @param field Calendar类中可以拿到
+     * @param preDays
+     * @return
+     */
     public static Date preTime(Date date,int field ,int preDays) {
         GregorianCalendar c1 = new GregorianCalendar();
         c1.setTime(date);
