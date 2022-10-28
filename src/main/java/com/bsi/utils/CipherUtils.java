@@ -16,10 +16,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.message.AuthException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateFactory;
@@ -111,6 +108,14 @@ public class CipherUtils {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate) cf.generateCertificate(stream);
     }
+    //签名方法
+    public static String sign(String data, String path, String type, String password) throws Exception {
+        InputStream is = new FileInputStream(path);
+        PrivateKey privateKey = loadPrivateKey(is, type, password);
+        String sign = sign(data, privateKey);
+        return sign;
+    }
+
 
     /**
      * 加载私钥
