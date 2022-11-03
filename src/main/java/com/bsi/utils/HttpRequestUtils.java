@@ -46,6 +46,13 @@ public class HttpRequestUtils {
     }
 
     /**
+     * 设置返回headers
+     * @param headers
+     */
+    public static void setResponseHeaders(Map<String, String> headers){
+        headers.forEach( (k,v) -> RequestUtils.getResponse().setHeader(k,v));
+    }
+    /**
      * 设置返回码
      */
     public static void setCode(int code){
