@@ -20,6 +20,7 @@ public class AgConstant {
     public static final String AG_NODETYPE_DATABASE = "db";
     public static final String AG_NODETYPE_APIUP = "apiUp";
     public static final String AG_NODETYPE_SAPRFC = "sapRFC";
+    public static final String AG_NODETYPE_MQ = "mq";
 
     //数据库分类
     public static final String AG_CLASSIFY_DB_SQLSERVER = "sqlserver";
@@ -27,6 +28,9 @@ public class AgConstant {
 
     //接口分类
     public static final String AG_CLASSIFY_API = "api";
+
+    //消息队列分类
+    public static final String AG_CLASSIFY_MQ_KAFKA = "kafka";
 
     //任务EhCache
     public static final String AG_EHCACHE_JOB = "job_config";

@@ -15,6 +15,7 @@ public class AgDatasourceContainer {
     private static Map<String, AgApiUpTemplate> apiUpMap = new HashMap<>();
     private static Map<String, AgSapRFCTemplate> sapRfcMap = new HashMap<>();
     private static Map<String, JSONObject> propertiesMap = new HashMap<>();
+    private static Map<String, AgKafkaTemplate> kafkaMap = new HashMap<>();
 
     /**
      * 获取数据源属性
@@ -69,6 +70,12 @@ public class AgDatasourceContainer {
         sapRfcMap.clear();
     }
     /**
+     * 清空jdbc数据源map
+     */
+    public static void clearKafkaDataSource(){
+        kafkaMap.clear();
+    }
+    /**
      * 添加一个jdbc数据源
      * @param key
      * @param template
@@ -94,6 +101,7 @@ public class AgDatasourceContainer {
         clearApiUpDataSource();
         clearJdbcDataSource();
         clearSapRfcDataSource();
+        clearKafkaDataSource();
         propertiesMap.clear();
     }
 
@@ -124,12 +132,28 @@ public class AgDatasourceContainer {
         return apiMap.get(key);
     }
     /**
+     * 获取kafka数据源
+     * @param key
+     * @return
+     */
+    public static AgKafkaTemplate getKafkaDataSource(String key){
+        return kafkaMap.get(key);
+    }
+    /**
      * 添加一个sapRFC数据源
      * @param key
      * @param template
      */
     public static void addSapRfcDataSource(String key,AgSapRFCTemplate template){
         sapRfcMap.put(key,template);
+    }
+    /**
+     * 添加一个kafka数据源
+     * @param key
+     * @param template
+     */
+    public static void addKafkaDataSource(String key,AgKafkaTemplate template){
+        kafkaMap.put(key,template);
     }
 
     /**

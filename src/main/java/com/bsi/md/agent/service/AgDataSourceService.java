@@ -118,6 +118,18 @@ public class AgDataSourceService extends FwService {
                                 config.getString("serverNo"),config.getString("clientNo"),config.getString("userName"),
                                 config.getString("password"),map);
                         AgDatasourceContainer.addSapRfcDataSource( ds.getId(), sapRFCTemplate);
+
+                    //MQ类型
+                    }else if( AgConstant.AG_NODETYPE_MQ.equals( ds.getType() ) ){
+                        Map<String,String> map = Collections.emptyMap();
+                        String otherParam = config.getString("otherParam");
+                        if(StringUtils.hasText(otherParam)){
+                            map = JSONObject.parseObject(otherParam,Map.class);
+                        }
+                        //String servers, String groupId, String autoCommit, String autoCommitInterval,String autoOffset ,String keyDecode, String classDecode
+                        AgKafkaTemplate kafkaTemplate = new AgKafkaTemplate(config.getString("servers"),config.getString("groupId"),(String) config.getOrDefault("autoCommit","true"),
+                                "2000","latest","org.apache.kafka.common.serialization.StringDeserializer","org.apache.kafka.common.serialization.StringDeserializer",map);
+                        AgDatasourceContainer.addKafkaDataSource(ds.getId(),kafkaTemplate);
                     }
                 }
             }
