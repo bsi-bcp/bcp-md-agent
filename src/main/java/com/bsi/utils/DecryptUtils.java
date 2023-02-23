@@ -1,12 +1,15 @@
 package com.bsi.utils;
 
+import com.bsi.factory.Base64Util;
 import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.huawei.m2m.edge.daemon.util.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -43,5 +46,14 @@ public class DecryptUtils {
         cipher.init(Cipher.DECRYPT_MODE,secretKeySpec);
         byte[] bytes = cipher.doFinal(encryptByte);
         return new String(bytes);
+    }
+
+    /**
+     * base64解码
+     * @param decodeString
+     * @return
+     */
+    public static String base64Decode(String decodeString) throws IOException {
+        return new String(Base64Util.decryptBASE64(decodeString));
     }
 }
