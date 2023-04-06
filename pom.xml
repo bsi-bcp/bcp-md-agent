@@ -145,6 +145,13 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.68</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.bsi</groupId>
+            <artifactId>dbf</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
 
