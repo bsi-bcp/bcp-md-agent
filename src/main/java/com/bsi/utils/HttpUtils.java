@@ -12,17 +12,24 @@ import com.bsi.framework.core.utils.RequestUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +75,31 @@ public class HttpUtils {
         HttpHeaders header = new HttpHeaders();
         headers.forEach(header::add);
         HttpEntity<String> strEntity = new HttpEntity<String>(body,header);
+        ResponseEntity<String> result = client.exchange(url, HttpMethod.valueOf(method),strEntity,String.class);
+        ar.setCode(result.getStatusCodeValue());
+        ar.setResult(result.getBody());
+        return ar;
+    }
+
+    /**
+     * 通过restTemplate请求数据
+     * @param url
+     * @param headers
+     * @param body
+     * @return
+     */
+    public static AgHttpResult requestByRestTemplateHttps(String method,String url,Map<String,String> headers, String body) throws Exception {
+        AgHttpResult ar = new AgHttpResult();
+        RestTemplate client = new RestTemplate();
+        client.setRequestFactory(new HttpComponentsClientHttpRequestFactory(
+                HttpClientBuilder.create()
+                        .setSSLContext(SSLContextBuilder.create()
+                                .loadTrustMaterial(new TrustSelfSignedStrategy())
+                                .build())
+                        .build()));
+        HttpHeaders header = new HttpHeaders();
+        headers.forEach(header::add);
+        HttpEntity<String> strEntity = new HttpEntity<>(body, header);
         ResponseEntity<String> result = client.exchange(url, HttpMethod.valueOf(method),strEntity,String.class);
         ar.setCode(result.getStatusCodeValue());
         ar.setResult(result.getBody());
