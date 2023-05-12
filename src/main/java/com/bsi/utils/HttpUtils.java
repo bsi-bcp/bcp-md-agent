@@ -12,6 +12,7 @@ import com.bsi.framework.core.utils.RequestUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -96,6 +97,7 @@ public class HttpUtils {
                         .setSSLContext(SSLContextBuilder.create()
                                 .loadTrustMaterial(new TrustSelfSignedStrategy())
                                 .build())
+                        .setSSLHostnameVerifier(new NoopHostnameVerifier())
                         .build()));
         HttpHeaders header = new HttpHeaders();
         headers.forEach(header::add);
