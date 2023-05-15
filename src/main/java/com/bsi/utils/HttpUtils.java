@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,6 +99,14 @@ public class HttpUtils {
         ResponseEntity<String> result = client.exchange(url, HttpMethod.valueOf(method),strEntity,String.class);
         ar.setCode(result.getStatusCodeValue());
         ar.setResult(result.getBody());
+
+        HttpHeader resHeader = HttpHeader.custom();
+        if( MapUtils.isNotEmpty(result.getHeaders()) ){
+            for(Map.Entry<String, List<String>> entrySet : result.getHeaders().entrySet()){
+                resHeader.other(entrySet.getKey(),entrySet.getValue().size() > 0 ? entrySet.getValue().get(0) : null);
+            }
+        }
+        ar.setHeader(resHeader.build());
         return ar;
     }
 
