@@ -9,6 +9,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +63,25 @@ public class FileUtils {
         File directory  = new File(path);
         return Arrays.stream(directory.listFiles())
                 .filter(file -> file.isFile() && Arrays.binarySearch(exts,getFileExtension(file))>=0 && file.length() <= maxSize)
+                .filter(file -> file.lastModified() > lastTs)
+                .map(File::getName)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 读取新增或者修改的文件
+     * @param path 文件路径
+     * @param exts 后缀名
+     * @param lastTs 最后更新时间毫秒数
+     * @param maxSize 最大大小
+     * @return
+     */
+    public static List<String> getNewOrModifiedFilesRegex(String path, Long lastTs,Long maxSize,String[] exts,String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        File directory  = new File(path);
+        return Arrays.stream(directory.listFiles())
+                .filter(file -> file.isFile() && Arrays.binarySearch(exts,getFileExtension(file))>=0 && file.length() <= maxSize)
+                .filter(file -> pattern.matcher(file.getName()).find())
                 .filter(file -> file.lastModified() > lastTs)
                 .map(File::getName)
                 .collect(Collectors.toList());

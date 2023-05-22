@@ -1,4 +1,5 @@
 package com.bsi.utils;
+
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.datasource.AgKafkaTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,11 @@ public class KafkaUtils {
     public static Object poll(String dataSourceId,String taskId,String topic,long timeOut){
         AgKafkaTemplate template = AgDatasourceContainer.getKafkaDataSource(dataSourceId);
         return template.poll(dataSourceId+"-"+taskId,topic,timeOut);
+    }
+
+    public static Object poll(String dataSourceId,String taskId,String topic,long from, long to) {
+        AgKafkaTemplate template = AgDatasourceContainer.getKafkaDataSource(dataSourceId);
+        return template.poll(dataSourceId+"-"+taskId,topic,from,to);
     }
 
     /**

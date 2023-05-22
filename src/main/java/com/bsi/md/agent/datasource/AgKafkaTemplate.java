@@ -8,14 +8,21 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndTimestamp;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * sapRfc类型数据源模板
@@ -76,6 +83,54 @@ public class AgKafkaTemplate implements AgDataSourceTemplate{
             otherParams.forEach((k,v)-> properties.setProperty(k,v) );
         }
         return new KafkaConsumer<>(properties);
+    }
+
+    /**
+     * 按照时间范围读取历史数据
+     * @param topic
+     * @return
+     */
+    public Object poll(String key,String topic,long from, long to){
+        JSONArray result = new JSONArray();
+        KafkaConsumer consumer = consumerMap.get(key);
+        if(consumer==null){
+            consumer = getConsumer();
+            consumerMap.put(key,consumer);
+            //consumer.subscribe(Arrays.asList(topic.split(",")));
+        }
+        List<PartitionInfo> partitions = consumer.partitionsFor(topic);
+        // 构建TopicPartition集合
+        Set<TopicPartition> topicPartitions = partitions.stream()
+                .map(pi -> new TopicPartition(pi.topic(), pi.partition()))
+                .collect(Collectors.toSet());
+        consumer.assign(topicPartitions);
+
+// 查询时间范围内的offset,返回 OffsetAndTimestamp
+        Map<TopicPartition, Long> fromTimestamps = topicPartitions.stream().collect(Collectors.toMap(k->k,v->from));
+        Map<TopicPartition, Long> toTimestamps = topicPartitions.stream().collect(Collectors.toMap(k->k,v->to));
+        Map<TopicPartition, OffsetAndTimestamp> fromOffsets = consumer.offsetsForTimes(fromTimestamps);
+        Map<TopicPartition, OffsetAndTimestamp> toOffsets = consumer.offsetsForTimes(toTimestamps);
+
+        for (TopicPartition tp : fromOffsets.keySet()) {
+            //订阅分区并查询指定offset范围的数据
+            long fromOffset = fromOffsets.get(tp).offset();
+            long toOffset = toOffsets.get(tp)==null?(Long)consumer.endOffsets(Collections.singleton(tp)).get(tp):toOffsets.get(tp).offset();
+            consumer.seek(tp, fromOffset);
+            while (consumer.position(tp) < toOffset) {
+                ConsumerRecords<String, String> crs = consumer.poll(Duration.ofMillis(1000));
+                for (ConsumerRecord<String, String> record : crs) {
+                    if(toOffset!=0 && record.offset()>toOffset){
+                        break;
+                    }
+                    JSONObject obj = new JSONObject();
+                    obj.put("key",record.key());
+                    obj.put("offset",record.offset());
+                    obj.put("value",record.value());
+                    result.add(obj);
+                }
+            }
+        }
+        return result.toJSONString();
     }
 
     /**
