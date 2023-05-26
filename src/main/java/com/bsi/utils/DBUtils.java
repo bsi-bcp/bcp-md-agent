@@ -1,7 +1,9 @@
 package com.bsi.utils;
 
+import com.bsi.framework.core.vo.resp.PageResp;
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.datasource.AgJdbcTemplate;
+import com.github.pagehelper.PageHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,13 @@ public class DBUtils {
     public static Object queryForList(String sql,Object[] args,String dataSourceId){
         AgJdbcTemplate template = AgDatasourceContainer.getJdbcDataSource(dataSourceId);
         return template.queryForList(sql,args);
+    }
+
+    public static Object queryListPage(String sql,Object[] args,Integer currentPage,Integer pageSize,String dataSourceId) {
+        PageHelper.startPage(currentPage,pageSize);
+        AgJdbcTemplate template = AgDatasourceContainer.getJdbcDataSource(dataSourceId);
+        PageResp res = template.queryListPage(sql,args);
+        return JSONUtils.toJson(res);
     }
 
     /**

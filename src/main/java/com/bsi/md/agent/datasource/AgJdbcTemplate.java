@@ -11,6 +11,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.parser.CountSqlParser;
 import org.apache.ibatis.cache.CacheKey;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -77,28 +78,28 @@ public class AgJdbcTemplate extends FwService {
 		return jdbcTemplate.queryForList(sql,args);
 	}
 	
-	public <T> PageResp<T> queryListPage(String sql,Class<T> c, Object[] args) throws DataAccessException {
-		Page<T> p = PageHelper.getLocalPage();
+	public PageResp queryListPage(String sql,Object[] args) throws DataAccessException {
+		Page p = PageHelper.getLocalPage();
 		
-		Page<T> rp = new Page<>(p.getPageNum(),p.getPageSize());
+		Page rp = new Page(p.getPageNum(),p.getPageSize());
 		CountSqlParser csp = new CountSqlParser();
 		String countSql = csp.getSmartCountSql(sql);
 		Integer count = jdbcTemplate.queryForObject(countSql, Integer.class, args);
 		rp.setTotal(count);
 		if( count<=0 ){
 			rp.close();
-			return new PageResp<T>();
+			return new PageResp();
 		}
-		String pagesql = autoDialect.getPageSql(sql, rp, new CacheKey(  ));
-		List<T> resultList = queryForList(pagesql, c, args);
+		String pagesql = autoDialect.getPageSql(sql, rp, new CacheKey());
+		List resultList = queryForList(pagesql, args);
 		if( CollectionUtils.isNotEmpty(resultList) ){
 			rp.addAll(resultList);
 		}
-		return new PageResp<T>(rp);
+		return new PageResp(rp);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <T> PageResp<T> queryListPage(String sql,Class<T> c, Object[] args,Integer currentPage,Integer pageSize,String limitOption) throws DataAccessException {
+	public PageResp queryListPage(String sql,Object[] args, Integer currentPage, Integer pageSize, String limitOption) throws DataAccessException {
 		PageResp res = new PageResp();
 		CountSqlParser csp = new CountSqlParser();
 		String countSql = csp.getSmartCountSql(sql);
@@ -113,7 +114,7 @@ public class AgJdbcTemplate extends FwService {
 		res.setCurrentPage(currentPage);
 		res.setCode(200);
 		String limitSql=" select top "+pageSize+" o.* from (select row_number() over("+limitOption+") as rownumber,* from("+sql+") as mm) as o where rownumber>"+pageSize*(currentPage -1);
-		List<T> resultList = queryForList(limitSql, c, args);
+		List resultList = queryForList(limitSql,args);
 		res.setModel(resultList);
 		return res;
 	}
