@@ -16,9 +16,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * springjdbc工具类
  * @author fish
@@ -27,7 +32,7 @@ public class AgJdbcTemplate extends FwService {
 	
 	protected AbstractHelperDialect autoDialect = null;
 	private FwJdbcTemplate jdbcTemplate = null;
-
+	private String dialect = null;
 	
 	public AgJdbcTemplate() {
 		
@@ -46,6 +51,7 @@ public class AgJdbcTemplate extends FwService {
 
 		//根据数据库连接信息解析出，数据库方言，用来分页
 		Class dialectClass = FwJdbcDialectUtils.getDialectClass(  url );
+		dialect = extract(url);
 		try {
 			autoDialect = (AbstractHelperDialect) dialectClass.newInstance();
 			autoDialect.setProperties(new Properties());
@@ -53,7 +59,14 @@ public class AgJdbcTemplate extends FwService {
 			throw new PageException("初始化 helper [" + dialectClass.toString() + "]时出错:" + e.getMessage(), e);
 		} 
 	}
-	
+	private String extract(String url) {
+		Matcher matcher = Pattern.compile("jdbc:([A-Za-z0-9_]+):.*").matcher(url);
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+		return null;
+	}
+
 	public FwJdbcTemplate getJdbcTemplate() {
 		return jdbcTemplate;
 	}
@@ -91,11 +104,37 @@ public class AgJdbcTemplate extends FwService {
 			return new PageResp();
 		}
 		String pagesql = autoDialect.getPageSql(sql, rp, new CacheKey());
-		List resultList = queryForList(pagesql, args);
+
+		List resultList = queryForList(pagesql, buildParams(rp,args));
 		if( CollectionUtils.isNotEmpty(resultList) ){
 			rp.addAll(resultList);
 		}
 		return new PageResp(rp);
+	}
+
+	/**
+	 * 分页参数处理
+	 * @param rp
+	 * @param args
+	 * @return
+	 */
+	private Object[] buildParams(Page rp,Object[] args){
+		args = (args == null ? new Object[]{} : args);
+		ArrayList<Object> list = new ArrayList<>(Arrays.asList(args));
+		if("oracle".equals(this.dialect) || "db2".equals(this.dialect)){
+			list.add(rp.getEndRow());
+			list.add(rp.getStartRow());
+			args = list.toArray();
+		}else if("mysql".equals(this.dialect) || "postgresql".equals(this.dialect)){
+			if(rp.getStartRow() == 0L){
+				list.add(rp.getPageSize());
+			}else{
+				list.add(rp.getStartRow());
+				list.add(rp.getPageSize());
+			}
+			args = list.toArray();
+		}
+		return args;
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -127,5 +166,9 @@ public class AgJdbcTemplate extends FwService {
 	 */
 	public int update(String sql,Object[] args){
 		return jdbcTemplate.update(sql,args);
+	}
+
+	public String getDialect(){
+		return this.dialect;
 	}
 }
