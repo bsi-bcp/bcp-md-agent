@@ -5,6 +5,7 @@ import com.bsi.framework.core.utils.ExceptionUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
@@ -19,6 +20,7 @@ public class ExcelUtil {
         numberFormat = NumberFormat.getNumberInstance();
         numberFormat.setGroupingUsed(false);
     }
+
     public static List<List<JSONObject>> readData(String filepath) {
         List<List<JSONObject>> sheetList = new ArrayList<>();
         try {
@@ -38,7 +40,7 @@ public class ExcelUtil {
                 // 遍历工作表中的每一行
                 for (int j = sheet.getFirstRowNum(); j <= sheet.getLastRowNum(); j++) {
                     Row row = sheet.getRow(j);
-                    if(row == null) continue;
+                    if (row == null) continue;
                     JSONObject map = new JSONObject();
                     for (int k = 0; k <= row.getLastCellNum(); k++) {
                         // 获取单元格的值
@@ -48,14 +50,14 @@ public class ExcelUtil {
                             value = null;
                         } else {
                             CellType cellType = cell.getCellTypeEnum();
-                            switch (cellType){
+                            switch (cellType) {
                                 case STRING:
                                     value = cell.getStringCellValue();
                                     break;
                                 case NUMERIC:
-                                    if(DateUtil.isCellDateFormatted(cell)){
-                                        value = DateUtils.toString(cell.getDateCellValue(),"yyyy-MM-dd HH:mm:ss.SSS");
-                                    }else {
+                                    if (DateUtil.isCellDateFormatted(cell)) {
+                                        value = DateUtils.toString(cell.getDateCellValue(), "yyyy-MM-dd HH:mm:ss.SSS");
+                                    } else {
                                         double number = cell.getNumericCellValue();
                                         value = numberFormat.format(number);
                                     }
@@ -67,7 +69,7 @@ public class ExcelUtil {
                                     value = "";
                             }
                         }
-                        map.put(k+"",value);
+                        map.put(k + 1 + "", value);
                     }
                     dataList.add(map);
                 }
