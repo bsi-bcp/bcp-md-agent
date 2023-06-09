@@ -11,6 +11,7 @@ import com.bsi.md.agent.constant.AgConstant;
 import com.bsi.md.agent.datasource.*;
 import com.bsi.md.agent.entity.AgDataSource;
 import com.bsi.md.agent.entity.dto.AgDataSourceDto;
+import com.bsi.md.agent.executor.AgExecutorService;
 import com.bsi.md.agent.ot.AgDcDriver;
 import com.bsi.md.agent.repository.AgDataSourceRepository;
 import com.bsi.md.agent.utils.AgJasyptUtils;
@@ -165,7 +166,9 @@ public class AgDataSourceService extends FwService {
             dataSource.setEnable( true );
             agDataSourceRepository.save(dataSource);
         }
-        //刷新缓存
-        refreshDataSource();
+        //刷新缓存，修改成异步,否则数据源初始化的时候卡住，会导致配置下发失败 2023.6.9
+        //AgExecutorService.getExecutor().submit(()->{
+            refreshDataSource();
+        //});
     }
 }

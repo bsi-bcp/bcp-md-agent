@@ -3,6 +3,7 @@ package com.bsi.md.agent.datasource;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
+import com.bsi.md.agent.executor.AgExecutorService;
 import com.bsi.utils.HttpUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,19 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
         this.servers = servers;
         this.groupId = groupId;
         this.otherParams = otherParams;
-        this.mqttClient = getClient();
+        //异步初始化，否则影响程序运行
+        AgExecutorService.getExecutor().submit(() -> {
+            this.mqttClient = getClient();
+        });
+
     }
 
     private MqttClient getClient(){
+        log.info("初始化mqtt数据源...");
         MqttClient client = null;
         try{
+            //延迟2秒初始化，先让执行引擎初始化完毕
+            Thread.sleep(2000L);
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(true);
             if(this.otherParams.containsKey("uname")){
@@ -48,6 +56,7 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
             }
             client = new MqttClient(this.servers,StringUtils.hasText(this.groupId)?this.groupId:MqttClient.generateClientId());
             client.connect(options);
+            log.info("mqtt connect {}",client.isConnected());
             client.subscribe(StringUtils.split(this.otherParams.get("topics"),","));
             client.setCallback(new MqttCallback() {
                 @Override
@@ -76,6 +85,7 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
         }catch (Exception e){
             log.info("connect mqtt broken error:{}", ExceptionUtils.getFullStackTrace(e));
         }
+        log.info("mqtt数据源初始化完毕...");
         return client;
     }
 
