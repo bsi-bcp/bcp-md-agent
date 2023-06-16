@@ -24,6 +24,7 @@ public class AgTaskLog {
     private int successSize; //成功条数
     private int failSize; //失败条数
     private String errorId; //错误日志id
+    private String lastTs;
 
     public String getClientIp() {
         if( StringUtils.isEmpty(clientIp) ){

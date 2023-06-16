@@ -5,6 +5,7 @@ import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.constant.AgConstant;
 import com.bsi.md.agent.engine.plugins.AgAfterOutputPluginManager;
 import com.bsi.md.agent.engine.plugins.AgTaskErrorDataWarnPlugin;
+import com.bsi.md.agent.log.AgTaskLog;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,9 @@ public class AgTaskBootStrap {
         //如果不是api上报、并且不是补数、并且有效数量大于0条则设置成功时间
         boolean successFlag = context.getResultLog()==null ? false : context.getResultLog().getValidSize()>0 ;
         if( !apiFlag && !repairFlag && successFlag ){
+            //如果手动设置了lastts，则取手动设置的值
+            AgTaskLog taskLog = context.getResultLog();
+            ts = StringUtils.hasText(taskLog.getLastTs())?taskLog.getLastTs():ts;
             EHCacheUtil.setValue("task_last_success_time",context.getTaskId(),ts,true);
         }
         info_log.debug("5.执行输出完成之后的插件");
