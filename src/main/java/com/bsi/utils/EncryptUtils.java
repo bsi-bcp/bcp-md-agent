@@ -1,35 +1,80 @@
 package com.bsi.utils;
 
-import com.bsi.factory.Base64Util;
 import com.bsi.factory.KeysFactory;
-import org.apache.commons.codec.digest.DigestUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
 import sun.misc.BASE64Encoder;
+import sun.rmi.runtime.Log;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 加密类
  */
+@Slf4j
 public class EncryptUtils {
 
 	// RSA最大加密明文大小
 	private static final int MAX_ENCRYPT_BLOCK = 117;
+	private static final int Initialization_Vector_Length = 12;
 	private static final String ALGORITHM_AES = "AES";
 	private static final String ALGORITHM_RSA = "RSA";
+	private static final String ALGORITHM_AES_GCM_NP = "AES/GCM/NoPadding";
+	public static String encrypt(String type,String key, String data, Map<String,String> config) throws Exception {
+		if (type == null)return null;
+		String value = "";
+		if (config == null) config = new HashMap<>();
+		switch (type){
+			case ALGORITHM_AES :
+				value = symEncrypt(key,data);
+				break;
+			case ALGORITHM_RSA :
+				value = pubEncrypt(key,data);
+				break;
+			case ALGORITHM_AES_GCM_NP :
+				value = encrypt_AES_GCM_NP(key,data,config.get("iv"));
+				break;
+			default:
+				log.warn("not found encrypt type, type:{}",type);
+		}
+		return value;
+	}
+
+	public static String encrypt_AES_GCM_NP(String secretKey,String data,String IVStr) throws Exception {
+		// 使用AESKey进行加密
+		byte[] iv;
+		if(IVStr == null){
+			SecureRandom secureRandom = new SecureRandom();
+			iv = new byte[Initialization_Vector_Length]; // GCM 推荐的 IV 长度是 12 字节
+			secureRandom.nextBytes(iv);
+		}else {
+			iv = IVStr.getBytes();
+		}
+		Cipher cipher = Cipher.getInstance(ALGORITHM_AES_GCM_NP);;
+		SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");// secretKey 是同步参数配置的加密秘钥
+		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128,iv);
+		cipher.init(Cipher.ENCRYPT_MODE, key, gcmParameterSpec);
+		byte[] bytes = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+		// 字符串转码后即为加密后的内容
+		return Base64.getEncoder().encodeToString(bytes);
+	}
 
 	/**
 	 * symEncrypt 对称加密
-	 * 
+	 *
 	 * @param strkey
 	 *            对称密钥
 	 * @param src
@@ -55,7 +100,7 @@ public class EncryptUtils {
 
 	/**
 	 * pubEncrypt 公钥加密
-	 * 
+	 *
 	 * @param pubKey
 	 *            公钥
 	 * @param src
