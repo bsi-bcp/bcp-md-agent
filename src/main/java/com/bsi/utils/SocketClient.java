@@ -9,6 +9,9 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.HashMap;
 
+/**
+ * socket客户端
+ */
 public class SocketClient {
     private Socket socket;
     private BufferedWriter writer;

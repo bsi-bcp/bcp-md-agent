@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+/**
+ * socket工具类
+ */
 public class SocketUtils {
     private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
     private static HashMap<String,SocketClient> clientMap = new HashMap<>();
