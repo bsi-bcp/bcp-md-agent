@@ -12,6 +12,8 @@ import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.parser.CountSqlParser;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -29,7 +31,7 @@ import java.util.regex.Pattern;
  * @author fish
  */
 public class AgJdbcTemplate extends FwService {
-	
+	private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 	protected AbstractHelperDialect autoDialect = null;
 	private FwJdbcTemplate jdbcTemplate = null;
 	private String dialect = null;
@@ -97,18 +99,21 @@ public class AgJdbcTemplate extends FwService {
 		Page rp = new Page(p.getPageNum(),p.getPageSize());
 		CountSqlParser csp = new CountSqlParser();
 		String countSql = csp.getSmartCountSql(sql);
+		info_log.info("countSql:{}",countSql);
 		Integer count = jdbcTemplate.queryForObject(countSql, Integer.class, args);
 		rp.setTotal(count);
+		info_log.info("count:{}",count);
 		if( count<=0 ){
 			rp.close();
 			return new PageResp();
 		}
 		String pagesql = autoDialect.getPageSql(sql, rp, new CacheKey());
-
+		info_log.info("pagesql:{}",pagesql);
 		List resultList = queryForList(pagesql, buildParams(rp,args));
 		if( CollectionUtils.isNotEmpty(resultList) ){
 			rp.addAll(resultList);
 		}
+		info_log.info("pagesqlover");
 		return new PageResp(rp);
 	}
 
