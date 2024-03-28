@@ -215,6 +215,8 @@ public class AgConfigController {
             url = "jdbc:postgresql://%s:%s/%s";
         }else if( "mysql".equals( dbType ) ){
             url = "jdbc:mysql://%s:%s/%s";
+        }else if( "guassdb".equals( dbType ) ){
+            url = "jdbc:mysql://%s:%s%s";
         }
         return String.format(url,obj.getString("url"),obj.getString("port"),obj.getString("databaseName"));
     }

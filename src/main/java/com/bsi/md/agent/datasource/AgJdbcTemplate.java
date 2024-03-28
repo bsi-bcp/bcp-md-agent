@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +38,6 @@ public class AgJdbcTemplate extends FwService {
 	public AgJdbcTemplate() {
 		
 	}
-
 	public void setDataSource(String driverClassName,String url,String username,String password) {
 		jdbcTemplate = new FwJdbcTemplate();
 		//读取数据库中的默认第三方数据源
@@ -130,7 +128,7 @@ public class AgJdbcTemplate extends FwService {
 			list.add(rp.getEndRow());
 			list.add(rp.getStartRow());
 			args = list.toArray();
-		}else if("mysql".equals(this.dialect) || "postgresql".equals(this.dialect)){
+		}else if("mysql".equals(this.dialect) || "postgresql".equals(this.dialect) || "zenith".equals(this.dialect)){
 			if(rp.getStartRow() == 0L){
 				list.add(rp.getPageSize());
 			}else{
