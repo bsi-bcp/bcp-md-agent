@@ -132,6 +132,8 @@ public class SocketServer {
                         out.write(callBackMsg.toString());
                         out.flush();
                     }
+                }else{
+                    info_log.info("line:{}",line);
                 }
             }
         } catch (IOException e) {
