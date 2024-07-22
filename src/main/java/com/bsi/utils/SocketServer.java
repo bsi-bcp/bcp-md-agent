@@ -149,8 +149,8 @@ public class SocketServer {
         } finally {
             try {
                 info_log.info("开始关闭客户端{}的资源",key);
-                if (in != null) in.close();
                 if (out != null) out.close();
+                if (in != null) in.close();
                 clientSocket.close();
                 info_log.info("资源关闭完毕");
             } catch (Exception e) {
