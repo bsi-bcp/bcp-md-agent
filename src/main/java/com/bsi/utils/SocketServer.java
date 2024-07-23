@@ -148,7 +148,6 @@ class ClientHandler implements Runnable {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             while (true) {
                 String line = in.readLine();
-                info_log.info("line:{}",":"+line+":");
                 if ( line==null ) {
                     //如果客户端直接断开连接，这个时候readLine()会返回null导致死循环，cpu占用率100%，所以读取到null要直接断开连接并关闭资源
                     info_log.info("客户端{}已经断开连接",key);
