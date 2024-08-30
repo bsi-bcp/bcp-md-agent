@@ -44,13 +44,9 @@ public class ModbusUtils {
                 JSONObject p = servicesList.getJSONObject(i);
                 // 存储服务的属性信息
                 Map<String, Object> properties = new HashMap<>();
-                // 遍历服务的属性，将其添加到属性集合中
-                p.forEach((k, v) -> {
-                    if (!"serviceId".equals(k))
-                        properties.put(k, v);
-                });
+
                 // 根据服务ID和服务属性创建服务数据对象，并记录当前时间
-                ServiceData serviceData = new ServiceData(p.getString("serviceId"), properties, ZonedDateTime.now());
+                ServiceData serviceData = new ServiceData(p.getString("serviceId"), p.getJSONObject("properties"), ZonedDateTime.now());
                 services.add(serviceData);
                 // 创建设备服务对象，关联设备ID和服务数据
                 DeviceService deviceService = new DeviceService(deviceId, services);
