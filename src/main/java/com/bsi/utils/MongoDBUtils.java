@@ -2,6 +2,7 @@ package com.bsi.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bsi.framework.core.utils.DateUtils;
 import com.bsi.framework.core.utils.FwSpringContextUtil;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -14,7 +15,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * 用来操作系统自带的mongodb
  */
 public class MongoDBUtils {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final MongoTemplate mongoTemplate = FwSpringContextUtil.getBean("mongoTemplate",MongoTemplate.class);
     /**
      * 批量插入 JSON 数据到指定集合。
@@ -35,6 +39,12 @@ public class MongoDBUtils {
      */
     public static void batchInsert(String jsonString, String collectionName) {
         List<Document> documents = JSONArray.parseArray(jsonString,Document.class);
+        Date currentDate = DateUtils.now("yyyy-MM-dd HH:mm:ss.SSS");
+
+        for (Document doc : documents) {
+            doc.put("_createTime", currentDate);
+            doc.put("_updateTime", currentDate);
+        }
         mongoTemplate.insert(documents, collectionName);
     }
 
@@ -47,7 +57,7 @@ public class MongoDBUtils {
      */
     public static void batchUpdate(String jsonString, String collectionName) {
         List<Document> documents = JSONArray.parseArray(jsonString,Document.class);
-
+        Date currentDate = DateUtils.now("yyyy-MM-dd HH:mm:ss.SSS");
         List<String> ids = new ArrayList<>();
         for (Document doc : documents) {
             Object id = doc.get("_id");
@@ -69,7 +79,7 @@ public class MongoDBUtils {
                     }
                 }
             }
-
+            update.set("_updateTime",currentDate);
             mongoTemplate.updateMulti(query, update, collectionName);
         }
     }
