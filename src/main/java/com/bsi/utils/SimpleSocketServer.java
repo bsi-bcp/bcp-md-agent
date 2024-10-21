@@ -25,11 +25,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SimpleSocketServer {
 
     private static final byte MGS_DELIMITER_0a = 0x0a;
-    private static final AtomicInteger clientCount = new AtomicInteger(0);
+    private final AtomicInteger clientCount = new AtomicInteger(0);
     private ServerSocket serverSocket;
     private ExecutorService executor = null;
-    public static Map<String, LinkedList<String>> msgMap = new HashMap<>();
-    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
+    public Map<String, LinkedList<String>> msgMap = new HashMap<>();
+    private static final Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
     public void start(int port, int maxClient) throws Exception {
         info_log.info("开始启动socket服务端,内网IP:{}，外网IP:{},端口号:{}", IpUtils.INTRANET_IP, IpUtils.INTERNET_IP, port);
@@ -129,7 +129,7 @@ public class SimpleSocketServer {
         }
     }
 
-    static class ClientHandler implements Runnable {
+    class ClientHandler implements Runnable {
         private LinkedList<String> msgList = new LinkedList<>();
         private BufferedWriter out = null;
         private InputStream in = null;
@@ -146,10 +146,13 @@ public class SimpleSocketServer {
                 ByteArrayOutputStream message = new ByteArrayOutputStream();
                 while (true) {
                     int bytesRead = in.read(buffer);
+                    info_log.info("b:{}",bytesRead);
                     if ( bytesRead == -1 ) {
                         //如果客户端直接断开连接，这个时候readLine()会返回null导致死循环，cpu占用率100%，所以读取到null要直接断开连接并关闭资源
-                        info_log.info("客户端{}已经断开连接",key);
-                        break;
+                        //info_log.info("客户端{}已经断开连接",key);
+                        info_log.info("客户端{}读取到空数据",key);
+                        continue;
+                        //break;
                     }
                     for (int i = 0; i < bytesRead; i++) {
                         byte b = buffer[i];

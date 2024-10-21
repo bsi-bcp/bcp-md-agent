@@ -24,11 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * socket客户端
  */
 public class SocketServerN {
-    private static final AtomicInteger clientCount = new AtomicInteger(0);
+    private final AtomicInteger clientCount = new AtomicInteger(0);
     private ServerSocket serverSocket;
     private ExecutorService executor = null;
-    public static Map<String, LinkedList<String>> msgMap = new HashMap<>();
-    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
+    public Map<String, LinkedList<String>> msgMap = new HashMap<>();
+    private static final Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
     public void start(int port, int maxClient,String protocol,boolean callBack) throws Exception {
         info_log.info("开始启动socket服务端,内网IP:{}，外网IP:{},端口号:{}", IpUtils.INTRANET_IP, IpUtils.INTERNET_IP, port);
@@ -128,7 +128,7 @@ public class SocketServerN {
         }
     }
 
-    static class ClientHandlerN implements Runnable {
+    class ClientHandlerN implements Runnable {
         private LinkedList<String> msgList = new LinkedList<>();
         private BufferedWriter out = null;
         private InputStream in = null;
