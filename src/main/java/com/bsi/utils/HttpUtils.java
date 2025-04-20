@@ -116,7 +116,7 @@ public class HttpUtils {
             ar.setResult(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
         }catch (Exception e){
             ar.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            ar.setResult(e.getMessage());
+            ar.setResult("调用异常,异常信息:"+ExceptionUtils.getFullStackTrace(e));
         }
         return ar;
     }
