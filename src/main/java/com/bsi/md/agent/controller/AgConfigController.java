@@ -167,7 +167,8 @@ public class AgConfigController {
         for(int i=0;i<jobs.size();i++){
             JSONObject job = jobs.getJSONObject(i);
             JSONObject tmp = new JSONObject();
-            tmp.put("jobId",job.getString("id"));
+            //iot下发的jobId拼接了configId,去除掉
+            tmp.put("jobId",job.getString("id").replace(config.getId()+"_",""));
             tmp.put("enable",job.getBoolean("enabled"));
             tmp.put("jobName",job.getString("name"));
             //输入节点组转
