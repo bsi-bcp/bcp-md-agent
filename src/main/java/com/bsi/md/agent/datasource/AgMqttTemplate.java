@@ -52,7 +52,11 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
             //延迟2秒初始化，先让执行引擎初始化完毕
             Thread.sleep(2000L);
             MqttConnectOptions options = new MqttConnectOptions();
-            options.setAutomaticReconnect(true);
+            options.setAutomaticReconnect(true); // 断线自动重连
+            options.setCleanSession(false);  // 保留会话
+            options.setKeepAliveInterval(60); // 每60秒保活
+            options.setConnectionTimeout(30); // 连接超时时间（秒）
+
             if(this.otherParams.containsKey("uname")){
                 options.setUserName(this.otherParams.get("uname"));
             }
@@ -66,7 +70,7 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
             client.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable throwable) {
-                    log.error("mqtt lost connection ...");
+                    log.error("mqtt lost connection :{}",ExceptionUtils.getFullStackTrace(throwable));
                     // 连接丢失
                 }
                 @Override
