@@ -3,11 +3,15 @@ package com.bsi.md.agent.ot;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.entity.dto.AgConfigDto;
 import com.bsi.md.agent.entity.dto.AgDataSourceDto;
+import com.bsi.md.agent.entity.dto.AgHttpResult;
 import com.bsi.md.agent.service.AgConfigService;
 import com.bsi.md.agent.service.AgDataSourceService;
+import com.bsi.utils.HttpUtils;
+import com.bsi.utils.JSONUtils;
 import com.huaweicloud.sdk.iot.module.DcClient;
 import com.huaweicloud.sdk.iot.module.ModuleShadowNotificationCallback;
 import com.huaweicloud.sdk.iot.module.PointsCallback;
@@ -24,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -129,7 +135,29 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
      */
     @Override
     public PointsSetRsp onPointSet(String requestId, PointsSetReq pointsSetReq) {
-        return null;
+        boolean flag = false;
+        try {
+            String msg = JSONUtils.toJson(pointsSetReq.getPoints());
+            log.info("device_prop_set msg:{}",msg);
+            AgHttpResult res = HttpUtils.post("http://localhost:8080/api/ot/device_prop_set",null,msg);
+            flag = res.getCode()==200;
+        }catch (Exception e){
+            log.error("device_prop_set error:{}", ExceptionUtils.getFullStackTrace(e));
+        }
+        log.info("设备{}",flag?"在线!":"离线!");
+        notifyDsConnectionState(flag);
+        return new PointsSetRsp(flag?0:1,flag?"success":"failure");
+    }
+
+    /**
+     * 设置通道状态
+     * @param flag
+     */
+    private void notifyDsConnectionState(boolean flag){
+        DsConnectionState conn = new DsConnectionState();
+        conn.setConnectionStatus(flag?ConnectionStatus.CONNECTED.name():ConnectionStatus.DISCONNECTED.name());
+        conn.setInfo(flag?"连接成功":"连接失败");
+        dcClient.notifyDsConnectionState( conn );
     }
 
     /**
@@ -137,7 +165,13 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
      */
     @Override
     public PointsGetRsp onPointGet(String requestId, PointsGetReq pointsGetReq) {
-        return null;
+        PointsGetRsp rsp = new PointsGetRsp();
+        Map<String, Object> points = new HashMap<>();
+        for (String point : pointsGetReq.getPoints()) {
+            points.put(point,null);
+        }
+        rsp.setPoints(points);
+        return rsp;
     }
 
     private String generateCron(int minute){
