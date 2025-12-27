@@ -69,31 +69,34 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
         //初始化数据源
         JSONObject otParam = obj.getJSONObject("properties").getJSONObject("connection_info");
         JSONArray dsArr = defaultValue.getJSONArray("bcp_ds");
-        for(int i=0;i<dsArr.size();i++){
-            AgDataSourceDto dto = JSON.parseObject(dsArr.getString(i),AgDataSourceDto.class);
-            JSONObject cfv = JSON.parseObject(dto.getConfigValue());
-            if(cfv.size()>0){
-                log.info("进行属性替换");
-                cfv.forEach((k,v)->{
-                    if("globalParams".equals(k)){
-                        return;
-                    }
-                    cfv.put(k,otParam.getOrDefault(dto.getId()+"_"+k,v));
-                });
-            }
-            JSONArray globalParams = cfv.getJSONArray("globalParams");
-            if(globalParams!=null && globalParams.size()>0){
-                for(int j=0;j<globalParams.size();j++){
-                    JSONObject glParam = globalParams.getJSONObject(j);
-                    glParam.put("value",otParam.getOrDefault(dto.getId()+"_"+glParam.get("key"),glParam.get("value")));
-                    glParam.put("source","ot");
+        if( dsArr!=null ){
+            for(int i=0;i<dsArr.size();i++){
+                AgDataSourceDto dto = JSON.parseObject(dsArr.getString(i),AgDataSourceDto.class);
+                JSONObject cfv = JSON.parseObject(dto.getConfigValue());
+                if(cfv.size()>0){
+                    log.info("进行属性替换");
+                    cfv.forEach((k,v)->{
+                        if("globalParams".equals(k)){
+                            return;
+                        }
+                        cfv.put(k,otParam.getOrDefault(dto.getId()+"_"+k,v));
+                    });
                 }
+                JSONArray globalParams = cfv.getJSONArray("globalParams");
+                if(globalParams!=null && globalParams.size()>0){
+                    for(int j=0;j<globalParams.size();j++){
+                        JSONObject glParam = globalParams.getJSONObject(j);
+                        glParam.put("value",otParam.getOrDefault(dto.getId()+"_"+glParam.get("key"),glParam.get("value")));
+                        glParam.put("source","ot");
+                    }
+                }
+                dto.setConfigValue(cfv.toJSONString());
+                log.info("更新第{}条数据源，数据:{}",i,JSON.toJSONString(dto));
+                //刷新数据源
+                agDataSourceService.updateDS(dto);
             }
-            dto.setConfigValue(cfv.toJSONString());
-            log.info("更新第{}条数据源，数据:{}",i,JSON.toJSONString(dto));
-            //刷新数据源
-            agDataSourceService.updateDS(dto);
         }
+
         //初始化配置
         AgConfigDto cfn = JSON.parseObject(defaultValue.getString("bcp_conf"),AgConfigDto.class);
         //配置中有些配置参数需要从点位中取值 TODO
