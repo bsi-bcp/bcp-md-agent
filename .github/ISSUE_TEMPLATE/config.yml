@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 问题讨论
+    url: https://github.com/paul-zhang-sudo/bcp-md-agent/discussions
+    about: 如果你有使用问题或想要讨论，请使用 Discussions
+  - name: 贡献指南
+    url: https://github.com/paul-zhang-sudo/bcp-md-agent/blob/master/CONTRIBUTING.md
+    about: 了解如何为项目做贡献
