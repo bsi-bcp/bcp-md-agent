@@ -1,0 +1,91 @@
+# MySQL 数据源配置示例
+# 复制到 src/main/resources/application.yml 并修改相关参数
+
+spring:
+  application:
+    name: md-agent
+
+  # MySQL 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/your_database?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: your_username
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # Druid 连接池配置
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      # 监控统计
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 2000
+      # Web 监控
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+        login-username: admin
+        login-password: admin
+
+  # JPA 配置
+  jpa:
+    database: MYSQL
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.bsi.md.agent: DEBUG
+  file:
+    name: logs/md-agent.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# MD-Agent 自定义配置
+ag:
+  # MongoDB 配置（可选）
+  mongodb:
+    enabled: false
+    uri: mongodb://localhost:27017/md-agent
+    database: md-agent
+
+  # Kafka 配置
+  kafka:
+    enabled: false
+    bootstrap-servers: localhost:9092
+
+  # 邮件配置
+  email:
+    enabled: false
+    host: smtp.example.com
+    port: 587
+    username: noreply@example.com
+    password: your_email_password
+    from: noreply@example.com

@@ -1,0 +1,132 @@
+# Docker Compose 配置示例
+# 包含 MD-Agent 和常用数据源
+
+version: '3.8'
+
+services:
+  # MD-Agent 服务
+  md-agent:
+    build: .
+    container_name: md-agent
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=md_agent
+      - DB_USERNAME=app_user
+      - DB_PASSWORD=app_password
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+    depends_on:
+      - mysql
+      - kafka
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: md-agent-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=md_agent
+      - MYSQL_USER=app_user
+      - MYSQL_PASSWORD=app_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15
+    container_name: md-agent-postgres
+    environment:
+      - POSTGRES_DB=md_agent
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=app_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  # Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: md-agent-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: md-agent-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  # MongoDB（可选）
+  mongodb:
+    image: mongo:7.0
+    container_name: md-agent-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin_password
+      - MONGO_INITDB_DATABASE=md_agent
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+  # RabbitMQ（可选）
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: md-agent-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # 管理界面
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin_password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - md-agent-network
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  postgres-data:
+  mongodb-data:
+  rabbitmq-data:
+
+networks:
+  md-agent-network:
+    driver: bridge

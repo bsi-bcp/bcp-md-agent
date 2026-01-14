@@ -1,5 +1,15 @@
 # MD-Agent
 
+<div align="center">
+
+[![CI Build](https://github.com/paul-zhang-sudo/bcp-md-agent/workflows/CI%20Build%20and%20Test/badge.svg)](https://github.com/paul-zhang-sudo/bcp-md-agent/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.3.7-green.svg)](https://spring.io/projects/spring-boot)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+</div>
+
 MD-Agent 是一个高度可配置的企业级数据集成引擎，支持 ETL（Extract-Transform-Load）操作，可连接多种异构数据源进行数据交换和同步。
 
 ## 功能特性
@@ -95,12 +105,63 @@ ag:
 - API 网关和接口代理
 - 消息队列的生产消费
 
+## 文档
+
+- [完整文档](docs/README.md)
+- [配置指南](docs/guides/datasource-config.md) - 数据源配置详解
+- [脚本开发](docs/guides/script-development.md) - JavaScript 转换脚本编写
+- [API 文档](docs/api/rest-api.md) - REST API 接口说明
+- [使用示例](docs/examples/database-sync.md) - 数据库同步示例
+- [故障排查](docs/guides/troubleshooting.md) - 常见问题解决
+
+## Docker 部署
+
+```bash
+# 使用 Docker Compose 快速启动
+docker-compose -f examples/docker-compose.yml up -d
+
+# 或使用 Docker 运行
+docker run -d \
+  -p 8080:8080 \
+  -v $(pwd)/config:/app/config \
+  -v $(pwd)/logs:/app/logs \
+  md-agent:latest
+```
+
+查看 [Dockerfile](examples/Dockerfile) 和 [docker-compose.yml](examples/docker-compose.yml) 示例。
+
+## 配置示例
+
+项目提供多种数据源配置示例：
+
+- [MySQL 配置](examples/application-mysql.yml)
+- [PostgreSQL 配置](examples/application-postgres.yml)
+- [Docker Compose 完整环境](examples/docker-compose.yml)
+
 ## 贡献
 
 欢迎贡献代码！请阅读 [贡献指南](CONTRIBUTING.md) 了解如何参与项目开发。
 
 本项目遵循 [贡献者公约行为准则](CODE_OF_CONDUCT.md)，参与者需遵守其规定。
 
+## 安全
+
+查看我们的 [安全政策](SECURITY.md) 了解如何报告安全漏洞。
+
+## 变更日志
+
+查看 [CHANGELOG.md](CHANGELOG.md) 了解各版本的更新内容。
+
 ## 许可证
 
 本项目采用 [MIT License](LICENSE) 开源协议。
+
+---
+
+<div align="center">
+
+**[文档](docs/README.md)** | **[贡献指南](CONTRIBUTING.md)** | **[Issues](https://github.com/paul-zhang-sudo/bcp-md-agent/issues)** | **[讨论](https://github.com/paul-zhang-sudo/bcp-md-agent/discussions)**
+
+Made with ❤️ by the MD-Agent Team
+
+</div>
