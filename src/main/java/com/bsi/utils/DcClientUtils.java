@@ -37,5 +37,6 @@ public class DcClientUtils {
             info_log.error("数据上报出现错误 ",e);
             return false;
         }
+
     }
 }
