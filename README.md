@@ -14,14 +14,95 @@ MD-Agent 是一个高度可配置的企业级数据集成引擎，支持 ETL（E
 
 ## 功能特性
 
-- **多数据源支持** - SQL Server、Oracle、PostgreSQL、MySQL、GaussDB、SQLite、MS Access
-- **消息队列集成** - Kafka、RabbitMQ、Apache Pulsar、MQTT
-- **企业系统对接** - SAP RFC 远程函数调用
-- **物联网支持** - Huawei IoT SDK 集成
-- **JavaScript 脚本转换** - 使用 JS 脚本进行灵活的数据转换
-- **定时任务** - 支持 Cron 表达式配置定时执行
-- **实时 API 代理** - 动态路由和接口鉴权
-- **告警通知** - 邮件、飞书机器人等多种告警方式
+### 🗄️ 多数据源支持
+- **关系型数据库**
+  - SQL Server - 企业级数据库，支持 JDBC 连接
+  - Oracle - 使用 ojdbc8 驱动，版本 21.5.0.0
+  - PostgreSQL - 开源关系型数据库
+  - MySQL/GaussDB - 兼容 MySQL 协议的数据库
+  - SQLite - 嵌入式数据库，默认配置
+  - MS Access - 通过 JDBC-ODBC 桥接
+- **连接池** - 集成 Druid 连接池，支持连接复用和监控
+
+### 📨 消息队列集成
+- **Kafka** - Apache Kafka 3.6.1，支持生产者/消费者模式
+- **RabbitMQ** - AMQP 协议消息队列
+- **Apache Pulsar** - 2.11.4 版本，云原生分布式消息系统
+- **MQTT** - 轻量级物联网通信协议
+
+### 🏢 企业系统对接
+- **SAP RFC 远程函数调用**
+  - 使用 sapjco3.jar (SAP JCo 3.0)
+  - 支持 SAP 系统远程函数调用
+  - 集成企业 ERP 系统数据交换
+
+### 🌐 物联网支持 - Huawei IoT SDK 集成
+
+#### 核心组件
+- **IoT Module Client SDK** - 版本 2.1.17
+- **三大核心客户端**：
+  - `ItClient` - IoT 边缘客户端，提供基础物联网通信能力
+  - `DriverClient` - 驱动客户端，用于子设备管理和网关功能
+  - `DcClient` - 数采客户端，专用于工业数据采集场景
+
+#### 设备管理能力
+- **设备属性管理**
+  - 设备属性上报 (Property Report)
+  - 设备属性下发与反控 (Property Set)
+  - 设备属性查询 (Property Get)
+  - 设备影子同步 (Shadow Sync)
+
+- **子设备管理**
+  - 子设备添加/删除事件处理
+  - 子设备消息接收与转发
+  - 子设备命令下发
+  - 网关回调机制 (GatewayCallback)
+
+#### 数据采集功能
+- **点位数据上报** - 通过 `DcClient.pointReport()` 上报工业数据点位
+- **数采配置下发** - 支持从华为云 IoTEdge 平台下发数采配置
+- **模块影子** - 自动同步边缘应用模块配置
+- **数据源动态配置** - 通过 IoT 平台远程配置数据源连接信息
+
+#### 集成方式
+- **环境变量初始化** - 通过 `createFromEnv()` 自动读取边缘环境配置
+- **自动重连** - 内置 MQTT 连接状态管理和自动重连机制
+- **本地 API 集成** - 设备反控消息自动转发到本地 API 端点 (`http://127.0.0.1:8080/api/device_prop_set`)
+- **回调机制** - 支持多种事件回调：
+  - 设备消息接收 (onDeviceMessageReceived)
+  - 设备命令调用 (onDeviceCommandCalled)
+  - 属性设置 (onDevicePropertiesSet)
+  - 影子接收 (onDeviceShadowReceived)
+
+#### 应用场景
+- 工业数据采集与上报
+- 设备远程监控与反控
+- 边缘网关设备管理
+- IoT 边缘计算应用
+- OT/IT 数据融合
+
+### ⚙️ JavaScript 脚本转换
+- 使用 Nashorn JavaScript 引擎
+- 支持 ES5+ 语法进行灵活的数据转换
+- 内置丰富的工具类库
+- 支持自定义函数和变量
+
+### ⏰ 定时任务
+- 支持 Cron 表达式配置定时执行
+- 灵活的任务调度策略
+- 任务执行状态监控
+
+### 🔌 实时 API 代理
+- 动态路由配置
+- 接口鉴权机制
+- 请求/响应转换
+- 负载均衡支持
+
+### 🔔 告警通知
+- **邮件告警** - SMTP 邮件发送
+- **飞书机器人** - Webhook 集成
+- 自定义告警规则
+- 多渠道消息推送
 
 ## 技术栈
 
